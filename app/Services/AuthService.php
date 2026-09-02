@@ -52,7 +52,7 @@ class AuthService
             return;
         }
 
-        return $this->authRepository->sendResetLink($dto->email);
+        $this->authRepository->sendResetLink($dto->email);
     }
 
     public function resetPassword(ResetPasswordDTO $dto): void
