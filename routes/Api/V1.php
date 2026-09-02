@@ -9,5 +9,5 @@ Route::prefix('auth')->controller(AuthController::class)->name('auth.')->group(f
     Route::post('/login', 'login')->name('login');
     Route::post('/forgot-password', 'forgotPassword')->middleware('throttle:5,1') ->name('forgot-password');
     Route::post('/reset-password', 'resetPassword')->middleware('throttle:5,1')->name('reset-password');
-    
+    Route::post('/logout', 'logout')->middleware('auth')->name('logout');
 });
