@@ -15,6 +15,16 @@ class ApiException extends Exception
         parent::__construct($message);
     }
 
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
     public function render(): JsonResponse
     {
         return response()->json([

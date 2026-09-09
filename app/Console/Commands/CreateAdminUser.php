@@ -8,7 +8,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Spatie\Permission\Models\Role;
 
-#[Signature('app:create-admin-user')]
+#[Signature('create:admin-user')]
 #[Description('Create an admin user for the application')]
 class CreateAdminUser extends Command
 {
