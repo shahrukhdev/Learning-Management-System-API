@@ -13,57 +13,49 @@ use Illuminate\Support\Facades\Password;
 
 class AuthService
 {
-    public function __construct(protected AuthInterface $authRepository) 
+    public function __construct(protected AuthInterface $repository) 
     {
         //
     }
 
-    public function login(LoginDTO $loginDTO): User
+    public function login(LoginDTO $dto): array
     {
-        $user = $this->authRepository->findByEmail($loginDTO->email);
+        $user = $this->repository->findByEmail($dto->email);
 
-        if (!$user || !Hash::check($loginDTO->password, $user->password)) {
+        if (!$user || !$user->is_active || !Hash::check($dto->password, $user->password)) {
             throw new ApiException(
-                message: 'The provided credentials are incorrect.',
+                message: 'These credentials do not match our records.',
                 status: 401
             );
         }
 
-        $this->authRepository->login($user);
+        $token = $this->repository->createToken($user);
 
-        return $user;
-    }
-
-    public function logout(): void
-    {
-        $this->authRepository->logout();
-    }
-
-    public function user(): ?User
-    {
-        return $this->authRepository->user();
+        return [
+            'user' => $user,
+            'token' => $token,
+        ];
     }
 
     public function forgotPassword(ForgotPasswordDTO $dto): void
     {
-        $user = $this->authRepository->findByEmail($dto->email);
+        $status = $this->repository->sendPasswordResetLink($dto->email);
 
-        if (!$user) {
-            return;
+        if ($status !== Password::RESET_LINK_SENT) {
+            throw new ApiException(
+                __($status),
+                422
+            );
         }
-
-        $this->authRepository->sendResetLink($dto->email);
     }
 
     public function resetPassword(ResetPasswordDTO $dto): void
     {
-        $status = $this->authRepository->resetPassword($dto->email, $dto->token, $dto->password);
+        $this->repository->resetPassword($dto);
+    }
 
-        if ($status !== Password::PASSWORD_RESET) {
-            throw new ApiException(
-                message: __($status),
-                status: 422
-            );
-        }
+    public function logout(User $user): void
+    {
+        $this->repository->logout($user);
     }
 }

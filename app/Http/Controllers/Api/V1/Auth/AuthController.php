@@ -12,10 +12,11 @@ use App\Http\Requests\Api\V1\Auth\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\ResetPasswordRequest;
 use App\Http\Resources\Api\V1\Auth\LoginResource;
 use App\Services\Auth\AuthService;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function __construct(protected AuthService $authService) 
+    public function __construct(protected AuthService $service) 
     {
         //
     }
@@ -25,13 +26,9 @@ class AuthController extends Controller
         try {
             $dto = LoginDTO::fromRequest($request);
 
-            $user = $this->authService->login($dto);
+            $result = $this->service->login($dto);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Login successful.',
-                'data' => new LoginResource($user),
-            ]);
+            return new LoginResource($result);
 
         } catch (ApiException $exception) {
             return response()->json([
@@ -39,7 +36,6 @@ class AuthController extends Controller
                 'message' => $exception->getMessage(),
                 'errors' => $exception->getErrors(),
             ], $exception->getStatus());
-
         } catch (\Exception $exception) {
             return response()->json([
                 'success' => false,
@@ -54,22 +50,19 @@ class AuthController extends Controller
         try {
             $dto = ForgotPasswordDTO::fromRequest($request);
 
-            $this->authService->forgotPassword($dto);
+            $this->service->forgotPassword($dto);
 
             return response()->json([
                 'success' => true,
-                'message' => 'If an account exists for this email, a password reset link has been sent.',
-                'data' => null,
+                'message' => 'Password reset link sent successfully.',
             ]);
-
         } catch (ApiException $exception) {
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
                 'errors' => $exception->getErrors(),
             ], $exception->getStatus());
-
-        } catch (\Throwable $exception) {
+        } catch (\Exception $exception) {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong.',
@@ -83,22 +76,19 @@ class AuthController extends Controller
         try {
             $dto = ResetPasswordDTO::fromRequest($request);
 
-            $this->authService->resetPassword($dto);
+            $this->service->resetPassword($dto);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Password has been reset successfully.',
-                'data' => null,
+                'message' => 'Password reset successfully.',
             ]);
-
         } catch (ApiException $exception) {
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
                 'errors' => $exception->getErrors(),
             ], $exception->getStatus());
-
-        } catch (\Throwable $exception) {
+        } catch (\Exception $exception) {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong.',
@@ -107,23 +97,22 @@ class AuthController extends Controller
         }
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         try {
-            $this->authService->logout();
+            $this->service->logout($request->user());
 
             return response()->json([
                 'success' => true,
-                'message' => 'Logout successful.',
-                'data' => null,
+                'message' => 'Logged out successfully.',
             ]);
-        } catch (ApiException $exception) {
+        } catch (ApiException $e) {
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
                 'errors' => $exception->getErrors(),
             ], $exception->getStatus());
-        } catch (\Throwable $exception) {
+        } catch (\Exception $exception) {
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong.',

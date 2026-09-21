@@ -3,7 +3,7 @@
 namespace App\DTO\Auth;
 
 use Illuminate\Http\Request;
-
+ 
 class LoginDTO
 {
     public function __construct(

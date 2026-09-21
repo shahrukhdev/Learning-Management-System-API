@@ -2,12 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Models\User;
 use App\Contracts\AuthInterface;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Password;
+use App\DTO\Auth\ResetPasswordDTO;
+use App\Exceptions\ApiException;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Password;
 
 class AuthRepository implements AuthInterface
 {
@@ -16,45 +16,47 @@ class AuthRepository implements AuthInterface
         return User::where('email', $email)->first();
     }
 
-    public function login(User $user): void
+    public function createToken(User $user): string
     {
-        Auth::login($user);
+        return $user->createToken('auth-token')->plainTextToken;
     }
 
-    public function logout(): void
-    {
-        Auth::logout();
-    }
-
-    public function user(): ?User
-    {
-        return Auth::user();
-    }
-
-    public function sendResetLink(string $email): string
+    public function sendPasswordResetLink(string $email): string
     {
         return Password::sendResetLink([
             'email' => $email,
         ]);
     }
 
-    public function resetPassword(string $email, string $token, string $password): string 
+    public function resetPassword(ResetPasswordDTO $dto): void
     {
-        return Password::reset(
+        $status = Password::reset(
             [
-                'email' => $email,
-                'token' => $token,
-                'password' => $password,
-                'password_confirmation' => $password,
+                'email' => $dto->email,
+                'password' => $dto->password,
+                'password_confirmation' => $dto->password,
+                'token' => $dto->token,
             ],
-            function (User $user, string $password) {
+            function (User $user, string $password): void {
                 $user->forceFill([
                     'password' => Hash::make($password),
-                ])->setRememberToken(Str::random(60));
+                ])->save();
 
-                $user->save();
+                $user->tokens()->delete();
             }
         );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            throw new ApiException(
+                message: __($status),
+                status: 422
+            );
+        }
+    }
+
+    public function logout(User $user): void
+    {
+        $user->currentAccessToken()->delete();
     }
 
 }

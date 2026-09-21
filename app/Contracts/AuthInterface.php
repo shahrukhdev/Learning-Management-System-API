@@ -2,19 +2,18 @@
 
 namespace App\Contracts;
 
+use App\DTO\Auth\ResetPasswordDTO;
 use App\Models\User;
 
 interface AuthInterface
 {
     public function findByEmail(string $email): ?User;
 
-    public function login(User $user): void;
+    public function createToken(User $user): string;
 
-    public function logout(): void;
+    public function sendPasswordResetLink(string $email): string;
 
-    public function user(): ?User;
+    public function resetPassword(ResetPasswordDTO $dto): void;
 
-    public function sendResetLink(string $email): string;
-
-    public function resetPassword(string $email, string $token, string $password): string;
+    public function logout(User $user): void;
 }
