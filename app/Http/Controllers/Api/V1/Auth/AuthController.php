@@ -66,7 +66,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong.',
-                'errors' => [],
+                'errors' => $exception->getMessage(),
             ], 500);
         }
     }
