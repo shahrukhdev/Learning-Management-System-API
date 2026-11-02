@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\System\StoreUserRequest;
 use App\Http\Requests\Api\V1\System\UpdateUserRequest;
+use App\Http\Resources\Api\V1\PaginationResource;
 use App\Http\Resources\Api\V1\System\UserResource;
 use App\Services\System\UserService;
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ class UserController extends Controller
                 'success' => true,
                 'message' => 'Users retrieved successfully.',
                 'data' => UserResource::collection($users)->collection,
+                'pagination' => (new PaginationResource($users))->resolve(),
             ]);
         } catch (ApiException $exception) {
             return response()->json([

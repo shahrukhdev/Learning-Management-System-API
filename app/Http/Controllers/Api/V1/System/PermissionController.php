@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\System\StorePermissionRequest;
 use App\Http\Requests\Api\V1\System\UpdatePermissionRequest;
+use App\Http\Resources\Api\V1\PaginationResource;
 use App\Http\Resources\Api\V1\System\PermissionResource;
 use App\Services\System\PermissionService;
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ class PermissionController extends Controller
             'success' => true,
             'message' => 'Permissions retrieved successfully.',
             'data' => PermissionResource::collection($permissions)->collection,
+            'pagination' => (new PaginationResource($permissions))->resolve(),
         ]);
         } catch (ApiException $exception) {
             return response()->json([

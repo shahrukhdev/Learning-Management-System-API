@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\System\StoreRoleRequest;
 use App\Http\Requests\Api\V1\System\UpdateRoleRequest;
+use App\Http\Resources\Api\V1\PaginationResource;
 use App\Http\Resources\Api\V1\System\RoleResource;
 use App\Services\System\RoleService;
 use Illuminate\Http\Request;
@@ -26,6 +27,7 @@ class RoleController extends Controller
                 'success' => true,
                 'message' => 'Roles retrieved successfully.',
                 'data' => RoleResource::collection($roles)->collection,
+                'pagination' => (new PaginationResource($roles))->resolve(),
             ]);
         } catch (ApiException $exception) {
             return response()->json([

@@ -66,7 +66,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Something went wrong.',
-                'errors' => $exception->getMessage(),
+                'errors' => [],
             ], 500);
         }
     }
@@ -106,7 +106,7 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Logged out successfully.',
             ]);
-        } catch (ApiException $e) {
+        } catch (ApiException $exception) {
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),

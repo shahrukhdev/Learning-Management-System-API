@@ -9,10 +9,10 @@ use App\Contracts\ProfileInterface;
 use App\Contracts\RoleInterface;
 use App\Contracts\UserInterface;
 use App\Repositories\AuthRepository;
-use App\Repositories\PermissionRepository;
-use App\Repositories\ProfileRepository;
-use App\Repositories\RoleRepository;
-use App\Repositories\UserRepository;
+use App\Repositories\Profile\ProfileRepository;
+use App\Repositories\System\PermissionRepository;
+use App\Repositories\System\RoleRepository;
+use App\Repositories\System\UserRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
