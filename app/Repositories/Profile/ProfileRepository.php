@@ -4,6 +4,7 @@ namespace App\Repositories\Profile;
 
 use App\Contracts\ProfileInterface;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileRepository implements ProfileInterface
@@ -16,6 +17,14 @@ class ProfileRepository implements ProfileInterface
     public function updateProfile(User $user, array $data): User
     {
         $oldImage = $user->image;
+
+        unset($data['confirm_password']);
+
+        if (!empty($data['new_password'])) {
+            $data['password'] = Hash::make($data['new_password']);
+        }
+
+        unset($data['new_password']);
 
         if (array_key_exists('image', $data)) {
             if ($data['image']) {
