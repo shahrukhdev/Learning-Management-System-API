@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Contracts;
+namespace App\Contracts\Auth;
 
 use App\DTO\Auth\ResetPasswordDTO;
 use App\Models\User;

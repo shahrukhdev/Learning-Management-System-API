@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Contracts\AcademicClassInterface;
 use App\Contracts\AttendanceInterface;
-use App\Contracts\AuthInterface;
+use App\Contracts\Auth\AuthInterface;
 use App\Contracts\CourseInterface;
 use App\Contracts\NoticeInterface;
 use App\Contracts\PermissionInterface;

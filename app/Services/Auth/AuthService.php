@@ -6,7 +6,7 @@ use App\DTO\Auth\ForgotPasswordDTO;
 use App\DTO\Auth\LoginDTO;
 use App\DTO\Auth\ResetPasswordDTO;
 use App\Models\User;
-use App\Contracts\AuthInterface;
+use App\Contracts\Auth\AuthInterface;
 use App\Exceptions\ApiException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;

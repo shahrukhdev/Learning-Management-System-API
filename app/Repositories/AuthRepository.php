@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Contracts\AuthInterface;
+use App\Contracts\Auth\AuthInterface;
 use App\DTO\Auth\ResetPasswordDTO;
 use App\Exceptions\ApiException;
 use App\Models\User;
