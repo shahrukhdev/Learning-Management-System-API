@@ -1,6 +1,18 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Academic\AcademicClassController;
+use App\Http\Controllers\Api\V1\Academic\AttendanceController;
+use App\Http\Controllers\Api\V1\Academic\CourseController;
+use App\Http\Controllers\Api\V1\Academic\StudentController;
+use App\Http\Controllers\Api\V1\Academic\TeacherController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
+use App\Http\Controllers\Api\V1\Hifz\HifzSessionController;
+use App\Http\Controllers\Api\V1\Hifz\HifzStatisticsController;
+use App\Http\Controllers\Api\V1\Hifz\JuzController;
+use App\Http\Controllers\Api\V1\Hifz\QuranMapController;
+use App\Http\Controllers\Api\V1\Hifz\SurahController;
+use App\Http\Controllers\Api\V1\Notice\NoticeController;
 use App\Http\Controllers\Api\V1\Profile\ProfileController;
 use App\Http\Controllers\Api\V1\System\PermissionController;
 use App\Http\Controllers\Api\V1\System\RoleController;
@@ -53,3 +65,91 @@ Route::middleware('auth:sanctum')->prefix('profile')->controller(ProfileControll
     Route::get('/', 'show')->name('show');
     Route::patch('/', 'update')->name('update');
 });
+
+// Course Routes
+Route::middleware('auth:sanctum')->prefix('courses')->controller(CourseController::class)->name('courses.')->group(function () {
+    Route::apiResource('/', CourseController::class)
+        ->parameters(['' => 'id']);
+});
+
+// Academic Class Routes
+Route::middleware('auth:sanctum')->prefix('academic-classes')->controller(AcademicClassController::class)->name('academic-classes.')->group(function () {
+    Route::apiResource('/', AcademicClassController::class)
+        ->parameters(['' => 'id']);
+});
+
+// Student Routes
+Route::middleware('auth:sanctum')->prefix('students')->controller(StudentController::class)->name('students.')->group(function () {
+    Route::apiResource('/', StudentController::class)
+        ->parameters(['' => 'id']);
+});
+
+// Attendance Routes
+Route::middleware('auth:sanctum')->prefix('attendances')->controller(AttendanceController::class)->name('attendances.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::post('/', 'store')->name('store');
+    Route::get('/overview', 'overview')->name('overview');
+});
+
+// Notice Routes
+Route::middleware('auth:sanctum')->prefix('notices')->controller(NoticeController::class)->name('notices.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::post('/', 'store')->name('store');
+    Route::get('/{id}', 'show')->name('show');
+    Route::put('/{id}', 'update')->name('update');
+    Route::delete('/{id}', 'destroy')->name('destroy');
+});
+
+// Teacher Routes
+Route::middleware('auth:sanctum')->prefix('teachers')->controller(TeacherController::class)->name('teachers.')->group(function () {
+    Route::apiResource('/', TeacherController::class)
+        ->parameters(['' => 'id']);
+});
+
+// Surah Routes
+Route::middleware('auth:sanctum')->prefix('surahs')->controller(SurahController::class)->name('surahs.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/{id}', 'show')->name('show');
+});
+
+// Juz Routes
+Route::middleware('auth:sanctum')->prefix('juz')->controller(JuzController::class)->name('juz.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/{id}', 'show')->name('show');
+});
+
+// Student Surah Progress Routes
+Route::middleware('auth:sanctum')->prefix('students/{studentId}/surah-progress')->controller(StudentSurahProgressController::class)->name('students.surah-progress.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::post('/', 'store')->name('store');
+});
+
+Route::middleware('auth:sanctum')->prefix('surah-progress')->controller(StudentSurahProgressController::class)->name('surah-progress.')->group(function () {
+    Route::put('/{id}', 'update')->name('update');
+    Route::delete('/{id}', 'destroy')->name('destroy');
+});
+
+// Hifz Session Routes
+Route::middleware('auth:sanctum')->prefix('students/{studentId}/hifz-sessions')->controller(HifzSessionController::class)->name('students.hifz-sessions.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::post('/', 'store')->name('store');
+    Route::get('/{id}', 'show')->name('show');
+    Route::put('/{id}', 'update')->name('update');
+    Route::delete('/{id}', 'destroy')->name('destroy');
+});
+
+// Quran Map Routes
+Route::middleware('auth:sanctum')->prefix('students/{studentId}/quran-map')->controller(QuranMapController::class)->name('students.quran-map.')->group(function () {
+    Route::get('/', 'index')->name('index');
+});
+
+// Dashboard Routes
+Route::middleware('auth:sanctum')->prefix('dashboard')->controller(DashboardController::class)->name('dashboard.')->group(function () {
+    Route::get('/summary', 'summary')->name('summary');
+});
+
+// Hifz Statistics Routes
+Route::middleware('auth:sanctum')->prefix('students/{studentId}/hifz-statistics')->controller(HifzStatisticsController::class)->name('students.hifz-statistics.')->group(function () {
+    Route::get('/', 'show')->name('show');
+});
+

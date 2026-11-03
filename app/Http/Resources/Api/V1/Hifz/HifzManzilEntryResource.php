@@ -1,0 +1,32 @@
+
+<?php
+
+namespace App\Http\Resources\Api\V1\Hifz;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class HifzManzilEntryResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'from_surah' => [
+                'id' => $this->fromSurah->id,
+                'number' => $this->fromSurah->number,
+                'name' => $this->fromSurah->name,
+                'arabic' => $this->fromSurah->arabic,
+            ],
+            'to_surah' => [
+                'id' => $this->toSurah->id,
+                'number' => $this->toSurah->number,
+                'name' => $this->toSurah->name,
+                'arabic' => $this->toSurah->arabic,
+            ],
+            'status' => $this->status,
+            'strength' => $this->strength,
+            'mistakes' => $this->mistakes,
+        ];
+    }
+}

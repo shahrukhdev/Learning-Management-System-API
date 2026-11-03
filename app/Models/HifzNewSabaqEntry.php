@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class HifzNewSabaqEntry extends Model
+{
+    protected $fillable = [
+        'hifz_session_id',
+        'from_surah_id',
+        'from_ayah',
+        'to_surah_id',
+        'to_ayah',
+    ];
+
+    public function hifzSession(): BelongsTo
+    {
+        return $this->belongsTo(HifzSession::class);
+    }
+
+    public function fromSurah(): BelongsTo
+    {
+        return $this->belongsTo(Surah::class, 'from_surah_id');
+    }
+
+    public function toSurah(): BelongsTo
+    {
+        return $this->belongsTo(Surah::class, 'to_surah_id');
+    }
+}
