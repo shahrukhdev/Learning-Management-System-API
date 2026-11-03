@@ -23,6 +23,7 @@ class CreateAdminUser extends Command
             'email' => 'admin@example.com'
         ], [
             'name' => 'Admin',
+            'phone_no' => fake()->phoneNumber(),
             'password' => bcrypt('Test1234')
         ]);
 

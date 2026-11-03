@@ -37,6 +37,11 @@ class UpdateUserRequest extends FormRequest
                 'string',
                 'min:8',
             ],
+            'phone_no' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
             'is_active' => [
                 'sometimes',
                 'boolean',

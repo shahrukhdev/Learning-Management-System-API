@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Resources\Api\V1\System;
@@ -14,6 +13,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name ?? '',
             'email' => $this->email ?? '',
+            'phone_no' => $this->phone_no ?? '',
             'image' => $this->image,
             'is_active' => (bool) $this->is_active,
             'roles' => RoleResource::collection(
