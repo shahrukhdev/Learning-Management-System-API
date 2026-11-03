@@ -36,6 +36,13 @@ class UpdateProfileRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($this->user()->id),
             ],
 
+            'phone_no' => [
+                'sometimes',
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
             'image' => [
                 'sometimes',
                 'nullable',

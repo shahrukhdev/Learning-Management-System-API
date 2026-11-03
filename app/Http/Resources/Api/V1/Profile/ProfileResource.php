@@ -20,6 +20,7 @@ class ProfileResource extends JsonResource
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'phone_no' => $user->phone_no ?? '',
             'is_active' => (bool) $user->is_active,
             'image' => $user->image,
             'role' => $user->getRoleNames()->first() ?? '',
