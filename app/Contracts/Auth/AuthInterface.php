@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Auth;
 
-use App\DTO\Auth\ResetPasswordDTO;
+use App\DTOs\Auth\ResetPasswordDTO;
 use App\Models\User;
 
 interface AuthInterface

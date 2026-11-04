@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
-use App\DTO\Auth\ForgotPasswordDTO;
-use App\DTO\Auth\LoginDTO;
-use App\DTO\Auth\ResetPasswordDTO;
+use App\DTOs\Auth\ForgotPasswordDTO;
+use App\DTOs\Auth\LoginDTO;
+use App\DTOs\Auth\ResetPasswordDTO;
 use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Auth\ForgotPasswordRequest;

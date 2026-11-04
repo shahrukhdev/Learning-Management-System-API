@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Contracts\Auth\AuthInterface;
-use App\DTO\Auth\ResetPasswordDTO;
+use App\DTOs\Auth\ResetPasswordDTO;
 use App\Exceptions\ApiException;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;

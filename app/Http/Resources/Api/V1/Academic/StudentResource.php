@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Resources\Api\V1\Academic;

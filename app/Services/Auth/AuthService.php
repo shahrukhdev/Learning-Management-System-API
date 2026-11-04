@@ -2,9 +2,9 @@
 
 namespace App\Services\Auth;
 
-use App\DTO\Auth\ForgotPasswordDTO;
-use App\DTO\Auth\LoginDTO;
-use App\DTO\Auth\ResetPasswordDTO;
+use App\DTOs\Auth\ForgotPasswordDTO;
+use App\DTOs\Auth\LoginDTO;
+use App\DTOs\Auth\ResetPasswordDTO;
 use App\Models\User;
 use App\Contracts\Auth\AuthInterface;
 use App\Exceptions\ApiException;
