@@ -47,8 +47,9 @@ class UpdateUserRequest extends FormRequest
                 'boolean',
             ],
             'roles' => [
-                'sometimes',
+                'required',
                 'array',
+                'min:1',
             ],
             'roles.*' => [
                 'integer',
