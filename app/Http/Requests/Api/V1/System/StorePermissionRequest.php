@@ -33,6 +33,10 @@ class StorePermissionRequest extends FormRequest
                 Rule::unique('permissions', 'name')
                     ->where('guard_name', 'web'),
             ],
+            'description' => [
+                'nullable',
+                'string',
+            ],
         ];
     }
 
