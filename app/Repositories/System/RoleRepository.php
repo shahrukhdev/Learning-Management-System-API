@@ -16,6 +16,7 @@ class RoleRepository implements RoleInterface
             ->where('guard_name', 'web')
             ->with('permissions')
             ->withCount('users');
+        dd($query->get());
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
