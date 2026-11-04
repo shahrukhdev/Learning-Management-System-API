@@ -14,7 +14,8 @@ class RoleRepository implements RoleInterface
     {
         $query = Role::query()
             ->where('guard_name', 'web')
-            ->with('permissions');
+            ->with('permissions')
+            ->withCount('users');
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
@@ -22,7 +23,7 @@ class RoleRepository implements RoleInterface
             $query->where('name', 'like', "%{$search}%");
         }
 
-        $perPage = min(max((int) ($filters['per_page'] ?? 15), 1), 100);
+        $perPage = min(max((int) ($filters['per_page'] ?? 10), 1), 100);
 
         return $query->latest()->paginate($perPage);
     }
