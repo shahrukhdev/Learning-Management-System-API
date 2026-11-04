@@ -37,6 +37,20 @@ class StorePermissionRequest extends FormRequest
                 'nullable',
                 'string',
             ],
+            'module_id' => [
+                'required',
+                'integer',
+                'exists:modules,id',
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'module_id.required' => 'The module field is required.',
+            'module_id.integer' => 'The selected module ID must be a valid integer.',
+            'module_id.exists' => 'The selected module does not exist.',
         ];
     }
 
