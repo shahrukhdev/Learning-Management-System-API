@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\Hifz\QuranMapController;
 use App\Http\Controllers\Api\V1\Hifz\SurahController;
 use App\Http\Controllers\Api\V1\Notice\NoticeController;
 use App\Http\Controllers\Api\V1\Profile\ProfileController;
+use App\Http\Controllers\Api\V1\System\ModuleController;
 use App\Http\Controllers\Api\V1\System\PermissionController;
 use App\Http\Controllers\Api\V1\System\RoleController;
 use App\Http\Controllers\Api\V1\System\UserController;
@@ -59,6 +60,12 @@ Route::middleware('auth:sanctum')->prefix('permissions')->controller(PermissionC
     Route::get('/{id}', 'show')->name('show');
     Route::put('/{id}', 'update')->name('update');
     Route::delete('/{id}', 'destroy')->name('destroy');
+});
+
+// Module Routes
+Route::middleware('auth:sanctum')->prefix('modules')->controller(ModuleController::class)->name('module.')->group(function () {
+
+    Route::get('/', 'index')->name('index');
 });
 
 // Profile Routes
