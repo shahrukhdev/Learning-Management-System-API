@@ -35,9 +35,15 @@ class UserRepository implements UserInterface
             });
         }
 
-        $perPage = min(max((int) ($filters['per_page'] ?? 15), 1), 100);
+        $sortDirection = ($filters['sort_direction'] ?? 'asc') === 'desc'
+            ? 'desc'
+            : 'asc';
 
-        return $query->latest()->paginate($perPage);
+        $query->orderBy('name', $sortDirection);
+
+        $perPage = min(max((int) ($filters['per_page'] ?? 10), 1), 100);
+
+        return $query->paginate($perPage);
     }
 
     public function createUser(array $data): User
