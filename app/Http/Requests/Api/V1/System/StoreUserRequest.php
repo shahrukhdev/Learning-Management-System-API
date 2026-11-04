@@ -44,8 +44,9 @@ class StoreUserRequest extends FormRequest
                 'boolean',
             ],
             'roles' => [
-                'sometimes',
+                'required',
                 'array',
+                'min:1',
             ],
             'roles.*' => [
                 'integer',
