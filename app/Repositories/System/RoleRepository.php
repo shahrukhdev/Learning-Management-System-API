@@ -15,7 +15,12 @@ class RoleRepository implements RoleInterface
         $query = Role::query()
             ->where('guard_name', 'web')
             ->with('permissions')
-            ->withCount('users');
+            ->addSelect([
+                'users_count' => DB::table('model_has_roles')
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn('model_has_roles.role_id', 'roles.id')
+                    ->where('model_has_roles.model_type', \App\Models\User::class),
+            ]);
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
