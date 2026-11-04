@@ -25,6 +25,10 @@ class UpdateRoleRequest extends FormRequest
                     ->where('guard_name', 'web')
                     ->ignore($this->route('id')),
             ],
+            'description' => [
+                'nullable',
+                'string',
+            ],
             'permissions' => [
                 'sometimes',
                 'array',
