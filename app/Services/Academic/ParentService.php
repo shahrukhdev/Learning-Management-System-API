@@ -2,7 +2,7 @@
 
 namespace App\Services\Academic;
 
-use App\Contracts\ParentInterface;
+use App\Contracts\Academic\ParentInterface;
 use App\DTOs\Academic\CreateParentDTO;
 use App\DTOs\Academic\UpdateParentDTO;
 use App\Models\StudentParent;
