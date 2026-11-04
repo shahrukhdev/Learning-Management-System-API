@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Database\Seeders\JuzSeeder;
 use Database\Seeders\JuzSurahRangeSeeder;
+use Database\Seeders\ModuleSeeder;
 use Database\Seeders\SurahSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -29,6 +30,7 @@ class DatabaseSeeder extends Seeder
             SurahSeeder::class,
             JuzSeeder::class,
             JuzSurahRangeSeeder::class,
+            ModuleSeeder::class,
         ]);
     }
 }
