@@ -42,6 +42,13 @@ class TeacherRepository implements TeacherInterface
             );
     }
 
+    public function findByUserId(int $userId): ?Teacher
+    {
+        return Teacher::query()
+            ->where('user_id', $userId)
+            ->first();
+    }
+
     public function create(CreateTeacherDTO $dto): Teacher
     {
         return DB::transaction(function () use ($dto) {

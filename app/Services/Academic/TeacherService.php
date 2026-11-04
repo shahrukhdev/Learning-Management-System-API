@@ -38,4 +38,24 @@ class TeacherService
     {
         $this->teacherRepository->delete($teacher);
     }
+
+    public function syncProfile(int $userId): void
+    {
+        $teacher = $this->teacherRepository->findByUserId($userId);
+
+        if (!$teacher) {
+            $this->teacherRepository->create(
+                new CreateTeacherDTO(userId: $userId)
+            );
+        }
+    }
+
+    public function deleteProfile(int $userId): void
+    {
+        $teacher = $this->teacherRepository->findByUserId($userId);
+
+        if ($teacher) {
+            $this->teacherRepository->delete($teacher);
+        }
+    }
 }

@@ -13,6 +13,8 @@ interface TeacherInterface
 
     public function findById(int $id): Teacher;
 
+    public function findByUserId(int $userId): ?Teacher;
+
     public function create(CreateTeacherDTO $dto): Teacher;
 
     public function update(Teacher $teacher, UpdateTeacherDTO $dto): Teacher;
