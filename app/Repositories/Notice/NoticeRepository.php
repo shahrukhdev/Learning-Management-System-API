@@ -31,7 +31,7 @@ class NoticeRepository implements NoticeInterface
             )
             ->latest()
             ->paginate(
-                min(max((int) ($filters['per_page'] ?? 15), 1), 100)
+                min(max((int) ($filters['per_page'] ?? 10), 1), 100)
             );
     }
 
