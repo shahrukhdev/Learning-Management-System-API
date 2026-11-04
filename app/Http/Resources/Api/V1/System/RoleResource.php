@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1\System;
 
+use App\Http\Resources\Api\V1\System\PermissionResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,7 +15,7 @@ class RoleResource extends JsonResource
             'name' => $this->name ?? '',
             'description' => $this->description ?? '',
             'guard_name' => $this->guard_name ?? '',
-            'users_count' => $this->users_count ?? 0,
+            'users_count' => (int) ($this->users_count ?? 0),
             'permissions' => PermissionResource::collection(
                 $this->whenLoaded('permissions')
             ),

@@ -12,14 +12,10 @@ class RoleRepository implements RoleInterface
 {
     public function getAllRoles(array $filters = []): LengthAwarePaginator
     {
-$role = Role::where('guard_name', 'web')->first();
-
-dd($role->users()->count());
         $query = Role::query()
             ->where('guard_name', 'web')
             ->with('permissions')
             ->withCount('users');
-        dd($query->get());
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
