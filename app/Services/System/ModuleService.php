@@ -2,7 +2,7 @@
 
 namespace App\Services\System;
 
-use App\Contracts\ModuleInterface;
+use App\Contracts\System\ModuleInterface;
 use Illuminate\Support\Collection;
 
 class ModuleService
