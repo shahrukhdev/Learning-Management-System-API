@@ -36,6 +36,10 @@ class UpdatePermissionRequest extends FormRequest
                     ->where('guard_name', 'web')
                     ->ignore($id),
             ],
+            'description' => [
+                'nullable',
+                'string',
+            ],
         ];
     }
 
