@@ -44,7 +44,6 @@ class TeacherService
         $teacher = $this->teacherRepository->findByUserId($userId);
 
         if (!$teacher) {
-            dd($userId);
             $this->teacherRepository->create(
                 new CreateTeacherDTO(userId: $userId)
             );
