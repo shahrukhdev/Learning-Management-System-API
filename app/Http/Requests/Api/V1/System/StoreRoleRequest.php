@@ -24,6 +24,10 @@ class StoreRoleRequest extends FormRequest
                 Rule::unique('roles', 'name')
                     ->where('guard_name', 'web'),
             ],
+            'description' => [
+                'nullable',
+                'string',
+            ],
             'permissions' => [
                 'sometimes',
                 'array',
