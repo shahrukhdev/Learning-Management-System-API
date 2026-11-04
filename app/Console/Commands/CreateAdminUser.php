@@ -22,7 +22,7 @@ class CreateAdminUser extends Command
         $user = User::updateOrCreate([
             'email' => 'admin@example.com'
         ], [
-            'name' => 'Admin',
+            'name' => 'Super Admin',
             'phone_no' => fake()->phoneNumber(),
             'password' => bcrypt('Test1234')
         ]);
