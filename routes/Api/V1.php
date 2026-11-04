@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Academic\AcademicClassController;
 use App\Http\Controllers\Api\V1\Academic\AttendanceController;
 use App\Http\Controllers\Api\V1\Academic\CourseController;
 use App\Http\Controllers\Api\V1\Academic\StudentController;
+use App\Http\Controllers\Api\V1\Academic\StudentParentController;
 use App\Http\Controllers\Api\V1\Academic\TeacherController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
@@ -103,6 +104,12 @@ Route::middleware('auth:sanctum')->prefix('notices')->controller(NoticeControlle
 // Teacher Routes
 Route::middleware('auth:sanctum')->prefix('teachers')->controller(TeacherController::class)->name('teachers.')->group(function () {
     Route::apiResource('/', TeacherController::class)
+        ->parameters(['' => 'id']);
+});
+
+// Parent Routes
+Route::middleware('auth:sanctum')->prefix('parents')->controller(StudentParentController::class)->name('parents.')->group(function () {
+    Route::apiResource('/', StudentParentController::class)
         ->parameters(['' => 'id']);
 });
 

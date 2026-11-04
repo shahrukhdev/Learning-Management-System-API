@@ -5,6 +5,7 @@ namespace App\Services\System;
 use App\Contracts\UserInterface;
 use App\Models\User;
 use App\Services\Academic\TeacherService;
+use App\Services\Academic\ParentService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserService
@@ -12,6 +13,7 @@ class UserService
     public function __construct(
         protected UserInterface $repository,
         protected TeacherService $teacherService,
+        protected ParentService $parentService,
     ) {
         //
     }
@@ -60,14 +62,25 @@ class UserService
         match ($role) {
             'Teacher' => $this->teacherService->syncProfile($user->id),
 
-            default => $this->teacherService->deleteProfile($user->id),
+            'Parent' => $this->parentService->syncProfile($user->id),
+
+            default => $this->deleteRoleProfiles($user->id),
         };
+    }
+
+    private function deleteRoleProfiles(int $userId): void
+    {
+        $this->teacherService->deleteProfile($userId);
+        $this->parentService->deleteProfile($userId);
     }
 
     private function syncRoleProfileForDeletion(User $user): void
     {
         match ($user->roles->first()?->name) {
             'Teacher' => $this->teacherService->deleteProfile($user->id),
+
+            'Parent' => $this->parentService->deleteProfile($user->id),
+
             default => null,
         };
     }
