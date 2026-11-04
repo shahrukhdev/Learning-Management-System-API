@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1\System;
 
+use \App\Models\Module;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,11 +15,18 @@ class PermissionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $module = Module::find($this->module_id);
+
         return [
             'id' => $this->id,
             'name' => $this->name ?? '',
             'description' => $this->description ?? '',
             'guard_name' => $this->guard_name ?? '',
+            'module_id' => $this->module_id,
+            'module' => [
+                'id' => $module?->id,
+                'name' => $module?->name ?? '',
+            ],
             'created_at' => $this->created_at?->format('d-m-Y'),
         ];
     }
