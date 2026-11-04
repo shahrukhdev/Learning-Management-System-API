@@ -16,6 +16,7 @@ class UserResource extends JsonResource
             'phone_no' => $this->phone_no ?? '',
             'image' => $this->image,
             'is_active' => (bool) $this->is_active,
+            'last_login' => formatLastLogin($this->last_login),
             'roles' => RoleResource::collection(
                 $this->whenLoaded('roles')
             ),

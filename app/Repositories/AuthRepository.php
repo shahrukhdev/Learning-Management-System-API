@@ -59,4 +59,11 @@ class AuthRepository implements AuthInterface
         $user->currentAccessToken()->delete();
     }
 
+    public function updateLastLogin(User $user): void
+    {
+        $user->forceFill([
+            'last_login' => now(),
+        ])->save();
+    }
+
 }

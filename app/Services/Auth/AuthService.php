@@ -31,8 +31,10 @@ class AuthService
 
         $token = $this->repository->createToken($user);
 
+        $this->repository->updateLastLogin($user);
+
         return [
-            'user' => $user,
+            'user' => $user->fresh(),
             'token' => $token,
         ];
     }

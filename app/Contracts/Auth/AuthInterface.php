@@ -16,4 +16,6 @@ interface AuthInterface
     public function resetPassword(ResetPasswordDTO $dto): void;
 
     public function logout(User $user): void;
+
+    public function updateLastLogin(User $user): void;
 }
