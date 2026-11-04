@@ -17,8 +17,13 @@ class CreateAdminUser extends Command
      */
     public function handle()
     {
-        $role = Role::firstOrCreate(['name' => 'Super Admin']);
-
+        $role = Role::updateOrCreate(
+            ['name' => 'Super Admin'],
+            [
+                'description' => 'Full system access, configuration, and security management.',
+            ]
+        );
+        
         $user = User::updateOrCreate([
             'email' => 'admin@example.com'
         ], [

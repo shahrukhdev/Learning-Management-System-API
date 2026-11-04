@@ -17,20 +17,25 @@ class SetupRolesAndPermissions extends Command
     public function handle()
     {
         $roles = [
-            'Admin',
-            'Teacher',
-            'Parent',
-            'Student',
+            'Admin' => 'System administration, user management, and operational oversight.',
+            'Teacher' => 'Classroom management, grading, lesson planning, and direct student interaction.',
+            'Parent' => 'Read-only access to specific student records, attendance, academic progress, and fee details.',
+            'Student' => 'Access to personal academic records, class schedules, assignments, grades, and learning resources.',
         ];
 
-        foreach ($roles as $role) {
-            Role::firstOrCreate([
-                'name' => $role,
-                'guard_name' => 'web',
-            ]);
+        foreach ($roles as $name => $description) {
+            Role::updateOrCreate(
+                [
+                    'name' => $name,
+                    'guard_name' => 'web',
+                ],
+                [
+                    'description' => $description,
+                ]
+            );
         }
 
-        $this->info('Roles created successfully.');
+        $this->info('Roles created and descriptions updated successfully.');
 
         return self::SUCCESS;
     }
