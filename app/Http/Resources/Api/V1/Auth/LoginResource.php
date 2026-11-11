@@ -28,6 +28,7 @@ class LoginResource extends JsonResource
                     'is_active' => $user->is_active,
                     'image' => $user->image,
                     'role' => $user->getRoleNames()->first() ?? '',
+                    'permissions' => $user->getAllPermissions()->pluck('name')->values(),
                 ],
                 'token' => $this->resource['token'] ?? '',
             ],

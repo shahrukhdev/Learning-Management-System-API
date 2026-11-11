@@ -24,6 +24,7 @@ class ProfileResource extends JsonResource
             'is_active' => (bool) $user->is_active,
             'image' => $user->image,
             'role' => $user->getRoleNames()->first() ?? '',
+            'permissions' => $user->getAllPermissions()->pluck('name')->values(),
         ];
     }
 }
