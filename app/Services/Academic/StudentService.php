@@ -42,14 +42,34 @@ class StudentService
 
     /**
      * Ensure the user has an active student record enrolled in the given class.
-     * An existing record is kept as is (only its class is synced); otherwise a
-     * new one is created from the user's data.
+     * An existing record is kept (its phone is synced from the user's phone_no
+     * and its class is synced); otherwise a new one is created from the user's data.
      */
     public function syncProfile(User $user, int $academicClassId): void
     {
         $student = $this->repository->findByUserId($user->id);
 
-        if (!$student) {
+        if ($student) {
+            if ($student->phone !== $user->phone_no) {
+                $student = $this->repository->updateStudent(
+                    $student->id,
+                    new UpdateStudentDTO(
+                        user_id: null,
+                        admission_number: null,
+                        date_of_birth: null,
+                        gender: null,
+                        phone: $user->phone_no,
+                        address: null,
+                        userIdProvided: false,
+                        admissionNumberProvided: false,
+                        dateOfBirthProvided: false,
+                        genderProvided: false,
+                        phoneProvided: true,
+                        addressProvided: false,
+                    )
+                );
+            }
+        } else {
             $student = $this->repository->createStudent(
                 new StoreStudentDTO(
                     user_id: $user->id,
