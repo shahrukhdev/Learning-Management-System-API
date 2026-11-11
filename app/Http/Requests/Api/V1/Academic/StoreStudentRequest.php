@@ -21,7 +21,7 @@ class StoreStudentRequest extends FormRequest
                 'nullable',
                 'integer',
                 'exists:users,id',
-                Rule::unique('students', 'user_id'),
+                Rule::unique('students', 'user_id')->whereNull('deleted_at'),
             ],
             'admission_number' => [
                 'required',

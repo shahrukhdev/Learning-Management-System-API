@@ -18,4 +18,8 @@ interface StudentInterface
     public function updateStudent(int $id, UpdateStudentDTO $dto): Student;
 
     public function deleteStudent(int $id): void;
+
+    public function findByUserId(int $userId): ?Student;
+
+    public function syncClass(Student $student, int $academicClassId): void;
 }

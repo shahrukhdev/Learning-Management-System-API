@@ -24,7 +24,7 @@ class UpdateStudentRequest extends FormRequest
                 'nullable',
                 'integer',
                 'exists:users,id',
-                Rule::unique('students', 'user_id')->ignore($studentId),
+                Rule::unique('students', 'user_id')->ignore($studentId)->whereNull('deleted_at'),
             ],
             'admission_number' => [
                 'sometimes',

@@ -89,4 +89,16 @@ class StudentRepository implements StudentInterface
 
         $student->delete();
     }
+
+    public function findByUserId(int $userId): ?Student
+    {
+        return Student::query()
+            ->where('user_id', $userId)
+            ->first();
+    }
+
+    public function syncClass(Student $student, int $academicClassId): void
+    {
+        $student->academicClasses()->sync([$academicClassId]);
+    }
 }

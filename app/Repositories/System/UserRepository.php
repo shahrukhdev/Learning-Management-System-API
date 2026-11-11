@@ -67,7 +67,7 @@ class UserRepository implements UserInterface
 
     public function getUser(int $id): User
     {
-        $user = User::with('roles')->find($id);
+        $user = User::with(['roles', 'student.academicClasses'])->find($id);
 
         if (!$user) {
             throw new ApiException(

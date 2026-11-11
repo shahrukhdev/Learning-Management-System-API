@@ -20,7 +20,24 @@ class UserResource extends JsonResource
             'roles' => RoleResource::collection(
                 $this->whenLoaded('roles')
             ),
+            $this->mergeWhen($this->relationLoaded('student'), fn () => $this->studentClass()),
             'created_at' => $this->created_at?->format('d-m-Y'),
+        ];
+    }
+
+    /**
+     * The class of the user's active student record (null when not a student).
+     */
+    private function studentClass(): array
+    {
+        $class = $this->student?->academicClasses->first();
+
+        return [
+            'class_id' => $class?->id,
+            'class' => $class ? [
+                'id' => $class->id,
+                'name' => $class->name,
+            ] : null,
         ];
     }
 }

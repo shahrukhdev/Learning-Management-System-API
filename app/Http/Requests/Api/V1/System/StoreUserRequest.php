@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
 class StoreUserRequest extends FormRequest
 {
@@ -54,7 +55,31 @@ class StoreUserRequest extends FormRequest
                 Rule::exists('roles', 'id')
                     ->where('guard_name', 'web'),
             ],
+            'class_id' => [
+                Rule::requiredIf(fn () => $this->hasStudentRole()),
+                'nullable',
+                'integer',
+                Rule::exists('academic_classes', 'id'),
+            ],
         ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'class_id.required' => 'The class field is required for students.',
+        ];
+    }
+
+    private function hasStudentRole(): bool
+    {
+        $roleIds = array_filter((array) $this->input('roles', []), 'is_numeric');
+
+        return !empty($roleIds) && Role::query()
+            ->whereIn('id', $roleIds)
+            ->where('name', 'Student')
+            ->where('guard_name', 'web')
+            ->exists();
     }
 
     protected function failedValidation(Validator $validator)

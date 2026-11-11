@@ -6,6 +6,7 @@ use App\Contracts\StudentInterface;
 use App\DTOs\Academic\StoreStudentDTO;
 use App\DTOs\Academic\UpdateStudentDTO;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class StudentService
@@ -37,5 +38,42 @@ class StudentService
     public function deleteStudent(int $id): void
     {
         $this->repository->deleteStudent($id);
+    }
+
+    /**
+     * Ensure the user has an active student record enrolled in the given class.
+     * An existing record is kept as is (only its class is synced); otherwise a
+     * new one is created from the user's data.
+     */
+    public function syncProfile(User $user, int $academicClassId): void
+    {
+        $student = $this->repository->findByUserId($user->id);
+
+        if (!$student) {
+            $student = $this->repository->createStudent(
+                new StoreStudentDTO(
+                    user_id: $user->id,
+                    admission_number: null,
+                    date_of_birth: null,
+                    gender: null,
+                    phone: $user->phone_no,
+                    address: null,
+                )
+            );
+        }
+
+        $this->repository->syncClass($student, $academicClassId);
+    }
+
+    /**
+     * Soft-delete the user's active student record, if any.
+     */
+    public function deleteProfile(int $userId): void
+    {
+        $student = $this->repository->findByUserId($userId);
+
+        if ($student) {
+            $this->repository->deleteStudent($student->id);
+        }
     }
 }

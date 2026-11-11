@@ -3,10 +3,13 @@
 namespace App\Services\System;
 
 use App\Contracts\UserInterface;
+use App\Exceptions\ApiException;
 use App\Models\User;
-use App\Services\Academic\TeacherService;
 use App\Services\Academic\ParentService;
+use App\Services\Academic\StudentService;
+use App\Services\Academic\TeacherService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class UserService
 {
@@ -14,6 +17,7 @@ class UserService
         protected UserInterface $repository,
         protected TeacherService $teacherService,
         protected ParentService $parentService,
+        protected StudentService $studentService,
     ) {
         //
     }
@@ -25,11 +29,15 @@ class UserService
 
     public function createUser(array $data): User
     {
-        $user = $this->repository->createUser($data);
+        $classId = $this->pullClassId($data);
 
-        $this->syncRoleProfile($user);
+        return DB::transaction(function () use ($data, $classId) {
+            $user = $this->repository->createUser($data);
 
-        return $user->load('roles');
+            $this->syncRoleProfile($user, $classId);
+
+            return $this->loadRelations($user);
+        });
     }
 
     public function getUser(int $id): User
@@ -39,23 +47,46 @@ class UserService
 
     public function updateUser(int $id, array $data): User
     {
-        $user = $this->repository->updateUser($id, $data);
+        $classId = $this->pullClassId($data);
 
-        $this->syncRoleProfile($user);
+        return DB::transaction(function () use ($id, $data, $classId) {
+            $user = $this->repository->updateUser($id, $data);
 
-        return $user->load('roles');
+            $this->syncRoleProfile($user, $classId);
+
+            return $this->loadRelations($user);
+        });
     }
 
     public function deleteUser(int $id): void
     {
         $user = $this->repository->getUser($id);
 
-        $this->syncRoleProfileForDeletion($user);
+        DB::transaction(function () use ($user, $id) {
+            $this->syncRoleProfileForDeletion($user);
 
-        $this->repository->deleteUser($id);
+            $this->repository->deleteUser($id);
+        });
     }
 
-    private function syncRoleProfile(User $user): void
+    /**
+     * class_id is not a users column; take it out of the payload.
+     */
+    private function pullClassId(array &$data): ?int
+    {
+        $classId = isset($data['class_id']) ? (int) $data['class_id'] : null;
+
+        unset($data['class_id']);
+
+        return $classId;
+    }
+
+    private function loadRelations(User $user): User
+    {
+        return $user->load(['roles', 'student.academicClasses']);
+    }
+
+    private function syncRoleProfile(User $user, ?int $classId): void
     {
         $role = $user->roles->first()?->name;
 
@@ -66,6 +97,22 @@ class UserService
 
             default => $this->deleteRoleProfiles($user->id),
         };
+
+        // Student: keep the existing record (or create a new one) and sync its class.
+        // Any other role: soft-delete the student record if the user had one.
+        if ($role === 'Student') {
+            if ($classId === null) {
+                throw new ApiException(
+                    message: 'The class field is required for students.',
+                    status: 422,
+                    errors: ['class_id' => ['The class field is required for students.']],
+                );
+            }
+
+            $this->studentService->syncProfile($user, $classId);
+        } else {
+            $this->studentService->deleteProfile($user->id);
+        }
     }
 
     private function deleteRoleProfiles(int $userId): void
@@ -80,6 +127,8 @@ class UserService
             'Teacher' => $this->teacherService->deleteProfile($user->id),
 
             'Parent' => $this->parentService->deleteProfile($user->id),
+
+            'Student' => $this->studentService->deleteProfile($user->id),
 
             default => null,
         };

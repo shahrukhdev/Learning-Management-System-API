@@ -8,7 +8,7 @@ readonly class StoreStudentDTO
 {
     public function __construct(
         public ?int $user_id,
-        public string $admission_number,
+        public ?string $admission_number,
         public ?string $date_of_birth,
         public ?string $gender,
         public ?string $phone,
