@@ -4,6 +4,7 @@ namespace App\Services\Academic;
 
 use App\Contracts\Academic\StudentProgressInterface;
 use App\DTOs\Academic\StoreStudentProgressDTO;
+use App\DTOs\Academic\UpdateStudentProgressDTO;
 use App\Exceptions\ApiException;
 use App\Models\Student;
 use App\Models\StudentProgress;
@@ -58,17 +59,69 @@ class StudentProgressService
     {
         $student = $this->getAccessibleStudent($user, $dto->student_id);
 
-        if (!$this->studentCourses($student)->contains('id', $dto->course_id)) {
+        $this->ensureCourseBelongsToStudent($student, $dto->course_id);
+
+        return $this->repository->createRecord($dto);
+    }
+
+    public function getRecord(User $user, int $studentId, int $id): StudentProgress
+    {
+        $student = $this->getAccessibleStudent($user, $studentId);
+
+        return $this->findStudentRecord($student, $id);
+    }
+
+    public function updateRecord(
+        User $user,
+        int $studentId,
+        int $id,
+        UpdateStudentProgressDTO $dto
+    ): StudentProgress {
+        $student = $this->getAccessibleStudent($user, $studentId);
+        $record = $this->findStudentRecord($student, $id);
+
+        if ($dto->course_id !== null && $dto->course_id !== $record->course_id) {
+            $this->ensureCourseBelongsToStudent($student, $dto->course_id);
+        }
+
+        return $this->repository->updateRecord($record, $dto);
+    }
+
+    public function deleteRecord(User $user, int $studentId, int $id): void
+    {
+        $student = $this->getAccessibleStudent($user, $studentId);
+        $record = $this->findStudentRecord($student, $id);
+
+        $this->repository->deleteRecord($record);
+    }
+
+    private function findStudentRecord(Student $student, int $id): StudentProgress
+    {
+        $record = $this->repository->findRecord($id, $student->id);
+
+        if (!$record) {
             throw new ApiException(
-                message: 'The selected subject is not assigned to this student\'s class.',
-                status: 422,
-                errors: [
-                    'course_id' => ['The selected subject is not assigned to this student\'s class.'],
-                ],
+                message: 'Progress record not found.',
+                status: 404
             );
         }
 
-        return $this->repository->createRecord($dto);
+        return $record;
+    }
+
+    private function ensureCourseBelongsToStudent(Student $student, int $courseId): void
+    {
+        if ($this->studentCourses($student)->contains('id', $courseId)) {
+            return;
+        }
+
+        throw new ApiException(
+            message: 'The selected subject is not assigned to this student\'s class.',
+            status: 422,
+            errors: [
+                'course_id' => ['The selected subject is not assigned to this student\'s class.'],
+            ],
+        );
     }
 
     /**

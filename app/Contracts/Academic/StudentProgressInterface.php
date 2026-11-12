@@ -3,6 +3,7 @@
 namespace App\Contracts\Academic;
 
 use App\DTOs\Academic\StoreStudentProgressDTO;
+use App\DTOs\Academic\UpdateStudentProgressDTO;
 use App\Models\Student;
 use App\Models\StudentProgress;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -34,4 +35,10 @@ interface StudentProgressInterface
     public function getStudentRecords(int $studentId, array $filters): LengthAwarePaginator;
 
     public function createRecord(StoreStudentProgressDTO $dto): StudentProgress;
+
+    public function findRecord(int $id, int $studentId): ?StudentProgress;
+
+    public function updateRecord(StudentProgress $record, UpdateStudentProgressDTO $dto): StudentProgress;
+
+    public function deleteRecord(StudentProgress $record): void;
 }

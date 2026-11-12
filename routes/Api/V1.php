@@ -100,6 +100,9 @@ Route::middleware('auth:sanctum')->prefix('student-progress')->controller(Studen
     Route::get('/{studentId}', 'show')->whereNumber('studentId')->name('show');
     Route::get('/{studentId}/records', 'records')->whereNumber('studentId')->name('records');
     Route::post('/{studentId}/records', 'store')->whereNumber('studentId')->name('store');
+    Route::get('/{studentId}/records/{id}', 'showRecord')->whereNumber(['studentId', 'id'])->name('records.show');
+    Route::put('/{studentId}/records/{id}', 'update')->whereNumber(['studentId', 'id'])->name('update');
+    Route::delete('/{studentId}/records/{id}', 'destroy')->whereNumber(['studentId', 'id'])->name('destroy');
 });
 
 // Attendance Routes

@@ -4,6 +4,7 @@ namespace App\Repositories\Academic;
 
 use App\Contracts\Academic\StudentProgressInterface;
 use App\DTOs\Academic\StoreStudentProgressDTO;
+use App\DTOs\Academic\UpdateStudentProgressDTO;
 use App\Enums\AttendanceStatus;
 use App\Enums\ProgressGrade;
 use App\Models\Student;
@@ -111,6 +112,26 @@ class StudentProgressRepository implements StudentProgressInterface
         $record = StudentProgress::create($dto->toArray());
 
         return $record->load(['course:id,name,code', 'recordedBy:id,name']);
+    }
+
+    public function findRecord(int $id, int $studentId): ?StudentProgress
+    {
+        return StudentProgress::query()
+            ->with(['course:id,name,code', 'recordedBy:id,name'])
+            ->where('student_id', $studentId)
+            ->find($id);
+    }
+
+    public function updateRecord(StudentProgress $record, UpdateStudentProgressDTO $dto): StudentProgress
+    {
+        $record->update($dto->toArray());
+
+        return $record->load(['course:id,name,code', 'recordedBy:id,name']);
+    }
+
+    public function deleteRecord(StudentProgress $record): void
+    {
+        $record->delete();
     }
 
     /**

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Api\V1\Academic;
 
 use App\DTOs\Academic\StoreStudentProgressDTO;
+use App\DTOs\Academic\UpdateStudentProgressDTO;
 use App\Enums\ProgressGrade;
 use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Academic\GetProgressStudentsRequest;
 use App\Http\Requests\Api\V1\Academic\GetStudentProgressRecordsRequest;
 use App\Http\Requests\Api\V1\Academic\StoreStudentProgressRequest;
+use App\Http\Requests\Api\V1\Academic\UpdateStudentProgressRequest;
 use App\Http\Resources\Api\V1\Academic\ProgressStudentResource;
 use App\Http\Resources\Api\V1\Academic\StudentProgressResource;
 use App\Http\Resources\Api\V1\PaginationResource;
@@ -123,6 +125,68 @@ class StudentProgressController extends Controller
                 'message' => 'Progress logged successfully.',
                 'data' => new StudentProgressResource($record),
             ], 201);
+        } catch (ApiException $exception) {
+            return $this->errorResponse($exception);
+        } catch (Exception $exception) {
+            return $this->serverErrorResponse();
+        }
+    }
+
+    /**
+     * A single progress record (e.g. to pre-fill the edit form).
+     */
+    public function showRecord(Request $request, int $studentId, int $id): JsonResponse
+    {
+        try {
+            $record = $this->service->getRecord($request->user(), $studentId, $id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress record retrieved successfully.',
+                'data' => new StudentProgressResource($record),
+            ]);
+        } catch (ApiException $exception) {
+            return $this->errorResponse($exception);
+        } catch (Exception $exception) {
+            return $this->serverErrorResponse();
+        }
+    }
+
+    /**
+     * Update a progress record (only the fields sent are changed).
+     */
+    public function update(UpdateStudentProgressRequest $request, int $studentId, int $id): JsonResponse
+    {
+        try {
+            $record = $this->service->updateRecord(
+                $request->user(),
+                $studentId,
+                $id,
+                UpdateStudentProgressDTO::fromRequest($request)
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress updated successfully.',
+                'data' => new StudentProgressResource($record),
+            ]);
+        } catch (ApiException $exception) {
+            return $this->errorResponse($exception);
+        } catch (Exception $exception) {
+            return $this->serverErrorResponse();
+        }
+    }
+
+    public function destroy(Request $request, int $studentId, int $id): JsonResponse
+    {
+        try {
+            $this->service->deleteRecord($request->user(), $studentId, $id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress deleted successfully.',
+                'data' => null,
+            ]);
         } catch (ApiException $exception) {
             return $this->errorResponse($exception);
         } catch (Exception $exception) {
