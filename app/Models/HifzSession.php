@@ -10,7 +10,7 @@ class HifzSession extends Model
 {
     protected $fillable = [
         'student_id',
-        'teacher_id',
+        'recorded_by',
         'session_date',
         'notes',
     ];
@@ -27,9 +27,9 @@ class HifzSession extends Model
         return $this->belongsTo(Student::class);
     }
 
-    public function teacher(): BelongsTo
+    public function recordedBy(): BelongsTo
     {
-        return $this->belongsTo(Teacher::class);
+        return $this->belongsTo(User::class, 'recorded_by');
     }
 
     public function oldSabaqEntries(): HasMany

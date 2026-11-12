@@ -12,7 +12,11 @@ class HifzSessionResource extends JsonResource
         return [
             'id' => $this->id,
             'student_id' => $this->student_id,
-            'teacher_id' => $this->teacher_id,
+            'recorded_by' => $this->recorded_by,
+            'recorded_by_user' => $this->whenLoaded('recordedBy', fn () => [
+                'id' => $this->recordedBy?->id,
+                'name' => $this->recordedBy?->name,
+            ]),
             'session_date' => $this->session_date?->format('Y-m-d'),
             'notes' => $this->notes,
 

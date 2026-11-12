@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Auth;
 
 class HifzSessionController extends Controller
 {
+    private const ALLOWED_RECORDER_ROLES = ['Teacher', 'Admin', 'Super Admin'];
+
     public function __construct(
         protected HifzSessionService $service
     ) {}
@@ -55,11 +57,10 @@ class HifzSessionController extends Controller
     ): JsonResponse {
         try {
             $user = Auth::user();
-            $teacher = $user?->teacher;
 
-            if (! $teacher) {
+            if (! $user || ! $user->hasAnyRole(self::ALLOWED_RECORDER_ROLES)) {
                 throw new ApiException(
-                    message: 'Authenticated user is not a teacher.',
+                    message: 'You are not allowed to record hifz sessions.',
                     status: 403
                 );
             }
@@ -67,7 +68,7 @@ class HifzSessionController extends Controller
             $dto = StoreHifzSessionDTO::fromRequest(
                 $request,
                 $studentId,
-                $teacher->id
+                $user->id
             );
 
             $session = $this->service->createSession($dto);

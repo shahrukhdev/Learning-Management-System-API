@@ -15,6 +15,7 @@ class HifzSessionRepository implements HifzSessionInterface
     private function sessionRelations(): array
     {
         return [
+            'recordedBy:id,name',
             'oldSabaqEntries.fromSurah',
             'oldSabaqEntries.toSurah',
             'manzilEntries.fromSurah',

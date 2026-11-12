@@ -22,6 +22,6 @@ class Teacher extends Model
 
     public function hifzSessions(): HasMany
     {
-        return $this->hasMany(HifzSession::class);
+        return $this->hasMany(HifzSession::class, 'recorded_by', 'user_id');
     }
 }
