@@ -23,6 +23,8 @@ use App\Contracts\Hifz\QuranMapInterface;
 use App\Contracts\Hifz\StudentSurahProgressInterface;
 use App\Contracts\Hifz\SurahInterface;
 use App\Contracts\System\ModuleInterface;
+use App\Models\User;
+use App\Observers\UserObserver;
 use App\Repositories\AuthRepository;
 use App\Repositories\Academic\AcademicClassRepository;
 use App\Repositories\Academic\AttendanceRepository;
@@ -78,6 +80,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        User::observe(UserObserver::class);
     }
 }
