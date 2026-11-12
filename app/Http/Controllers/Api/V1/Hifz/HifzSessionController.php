@@ -40,7 +40,7 @@ class HifzSessionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
-            ], $exception->status);
+            ], $exception->getStatus());
         } catch (Exception $exception) {
             return response()->json([
                 'success' => false,
@@ -81,7 +81,7 @@ class HifzSessionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
-            ], $exception->status);
+            ], $exception->getStatus());
         } catch (Exception $exception) {
             return response()->json([
                 'success' => false,
@@ -104,7 +104,7 @@ class HifzSessionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
-            ], $exception->status);
+            ], $exception->getStatus());
         } catch (Exception $exception) {
             return response()->json([
                 'success' => false,
@@ -136,7 +136,7 @@ class HifzSessionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
-            ], $exception->status);
+            ], $exception->getStatus());
         } catch (Exception $exception) {
             return response()->json([
                 'success' => false,
@@ -158,7 +158,7 @@ class HifzSessionController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
-            ], $exception->status);
+            ], $exception->getStatus());
         } catch (Exception $exception) {
             return response()->json([
                 'success' => false,
