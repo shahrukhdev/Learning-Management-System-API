@@ -2,23 +2,23 @@
 
 namespace App\Services\Hifz;
 
-use App\Contracts\Hifz\JuzInterface;
-use App\Models\Juz;
+use App\Contracts\Hifz\SurahInterface;
+use App\Models\Surah;
 use Illuminate\Database\Eloquent\Collection;
 
-class JuzService
+class SurahService
 {
     public function __construct(
-        protected JuzInterface $repository
+        protected SurahInterface $repository
     ) {}
 
-    public function getAllJuz(): Collection
+    public function getAllSurahs(): Collection
     {
-        return $this->repository->getAllJuz();
+        return $this->repository->getAllSurahs();
     }
 
-    public function getJuz(int $id): Juz
+    public function getSurah(int $id): Surah
     {
-        return $this->repository->getJuz($id);
+        return $this->repository->getSurah($id);
     }
 }
