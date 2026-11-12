@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Hifz\HifzStatisticsController;
 use App\Http\Controllers\Api\V1\Hifz\JuzController;
 use App\Http\Controllers\Api\V1\Hifz\QuranMapController;
 use App\Http\Controllers\Api\V1\Hifz\SurahController;
+use App\Http\Controllers\Api\V1\Hifz\StudentSurahProgressController;
 use App\Http\Controllers\Api\V1\Notice\NoticeController;
 use App\Http\Controllers\Api\V1\Profile\ProfileController;
 use App\Http\Controllers\Api\V1\System\ModuleController;
