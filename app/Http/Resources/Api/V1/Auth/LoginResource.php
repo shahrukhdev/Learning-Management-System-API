@@ -23,6 +23,7 @@ class LoginResource extends JsonResource
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,
+                    'initials' => $user->initials ?? '',
                     'email' => $user->email,
                     'phone_no' => $user->phone_no ?? '',
                     'is_active' => $user->is_active,

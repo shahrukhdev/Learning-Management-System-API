@@ -19,6 +19,7 @@ class ProfileResource extends JsonResource
         return [
             'id' => $user->id,
             'name' => $user->name,
+            'initials' => $user->initials ?? '',
             'email' => $user->email,
             'phone_no' => $user->phone_no ?? '',
             'is_active' => (bool) $user->is_active,
