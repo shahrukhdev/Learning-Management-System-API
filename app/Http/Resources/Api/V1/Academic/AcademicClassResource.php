@@ -16,6 +16,18 @@ class AcademicClassResource extends JsonResource
             'description' => $this->description ?? '',
             'capacity' => $this->capacity,
             'is_active' => (bool) $this->is_active,
+            'teacher_ids' => $this->whenLoaded(
+                'teachers',
+                fn () => $this->teachers->pluck('id')->values()
+            ),
+            'teachers' => $this->whenLoaded(
+                'teachers',
+                fn () => $this->teachers->map(fn ($teacher) => [
+                    'id' => $teacher->id,
+                    'user_id' => $teacher->user_id,
+                    'name' => $teacher->user?->name ?? '',
+                ])->values()
+            ),
             'created_at' => $this->created_at?->format('d-m-Y'),
         ];
     }

@@ -13,6 +13,7 @@ readonly class UpdateAcademicClassDTO
         public ?int $capacity,
         public ?bool $is_active,
         public ?array $course_ids,
+        public ?array $teacher_ids,
         public bool $codeProvided,
         public bool $descriptionProvided,
         public bool $capacityProvided,
@@ -32,6 +33,9 @@ readonly class UpdateAcademicClassDTO
                 : null,
             course_ids: array_key_exists('course_ids', $data)
                 ? $data['course_ids']
+                : null,
+            teacher_ids: array_key_exists('teacher_ids', $data)
+                ? $data['teacher_ids']
                 : null,
             codeProvided: array_key_exists('code', $data),
             descriptionProvided: array_key_exists('description', $data),

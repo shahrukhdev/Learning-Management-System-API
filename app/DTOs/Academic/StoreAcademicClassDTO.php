@@ -13,6 +13,7 @@ readonly class StoreAcademicClassDTO
         public ?int $capacity,
         public bool $is_active,
         public array $course_ids,
+        public array $teacher_ids,
     ) {}
 
     public static function fromRequest(StoreAcademicClassRequest $request): self
@@ -26,6 +27,7 @@ readonly class StoreAcademicClassDTO
             capacity: isset($data['capacity']) ? (int) $data['capacity'] : null,
             is_active: (bool) ($data['is_active'] ?? true),
             course_ids: $data['course_ids'] ?? [],
+            teacher_ids: $data['teacher_ids'] ?? [],
         );
     }
 

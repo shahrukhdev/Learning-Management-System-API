@@ -21,6 +21,12 @@ class AcademicClass extends Model
         return $this->belongsToMany(Course::class, 'academic_class_course')->withTimestamps();
     }
 
+    public function teachers(): BelongsToMany
+    {
+        return $this->belongsToMany(Teacher::class, 'academic_class_teacher')
+            ->withTimestamps();
+    }
+
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);

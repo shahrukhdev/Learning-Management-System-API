@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Academic\AttendanceController;
 use App\Http\Controllers\Api\V1\Academic\CourseController;
 use App\Http\Controllers\Api\V1\Academic\StudentController;
 use App\Http\Controllers\Api\V1\Academic\StudentParentController;
+use App\Http\Controllers\Api\V1\Academic\StudentProgressController;
 use App\Http\Controllers\Api\V1\Academic\TeacherController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
@@ -91,6 +92,14 @@ Route::middleware('auth:sanctum')->prefix('academic-classes')->controller(Academ
 Route::middleware('auth:sanctum')->prefix('students')->controller(StudentController::class)->name('students.')->group(function () {
     Route::apiResource('/', StudentController::class)
         ->parameters(['' => 'id']);
+});
+
+// Student Progress Routes
+Route::middleware('auth:sanctum')->prefix('student-progress')->controller(StudentProgressController::class)->name('student-progress.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/{studentId}', 'show')->whereNumber('studentId')->name('show');
+    Route::get('/{studentId}/records', 'records')->whereNumber('studentId')->name('records');
+    Route::post('/{studentId}/records', 'store')->whereNumber('studentId')->name('store');
 });
 
 // Attendance Routes

@@ -54,6 +54,11 @@ class Student extends Model
         return $this->hasMany(HifzSession::class);
     }
 
+    public function progressRecords(): HasMany
+    {
+        return $this->hasMany(StudentProgress::class);
+    }
+
     public function surahProgress(): HasMany
     {
         return $this->hasMany(StudentSurahProgress::class);

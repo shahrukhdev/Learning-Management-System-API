@@ -35,6 +35,12 @@ class UpdateAcademicClassRequest extends FormRequest
                 'distinct',
                 Rule::exists('courses', 'id'),
             ],
+            'teacher_ids' => ['sometimes', 'array'],
+            'teacher_ids.*' => [
+                'integer',
+                'distinct',
+                Rule::exists('teachers', 'id')->whereNull('deleted_at'),
+            ],
         ];
     }
 

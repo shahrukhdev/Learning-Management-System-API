@@ -14,7 +14,7 @@ class AcademicClassRepository implements AcademicClassInterface
 {
     public function getAllAcademicClasses(array $filters = []): LengthAwarePaginator
     {
-        $query = AcademicClass::query()->with('courses');
+        $query = AcademicClass::query()->with(['courses', 'teachers.user']);
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
@@ -40,14 +40,15 @@ class AcademicClassRepository implements AcademicClassInterface
             $class = AcademicClass::create($dto->toArray());
 
             $class->courses()->sync($dto->course_ids);
+            $class->teachers()->sync($dto->teacher_ids);
 
-            return $class->load('courses');
+            return $class->load(['courses', 'teachers.user']);
         });
     }
 
     public function getAcademicClass(int $id): AcademicClass
     {
-        $class = AcademicClass::with('courses')->find($id);
+        $class = AcademicClass::with(['courses', 'teachers.user'])->find($id);
 
         if (!$class) {
             throw new ApiException(
@@ -77,7 +78,11 @@ class AcademicClassRepository implements AcademicClassInterface
                 $class->courses()->sync($dto->course_ids);
             }
 
-            return $class->load('courses');
+            if ($dto->teacher_ids !== null) {
+                $class->teachers()->sync($dto->teacher_ids);
+            }
+
+            return $class->load(['courses', 'teachers.user']);
         });
     }
 
