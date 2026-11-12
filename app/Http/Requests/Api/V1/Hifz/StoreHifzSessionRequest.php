@@ -53,6 +53,11 @@ class StoreHifzSessionRequest extends FormRequest
                 'integer',
                 'exists:surahs,id',
             ],
+            'old_sabaq.*.page' => [
+                'nullable',
+                'integer',
+                'min:0',
+            ],
             'old_sabaq.*.status' => [
                 'nullable',
                 Rule::in(['fluent', 'mistakes', 'repeat', 'needs-revision']),

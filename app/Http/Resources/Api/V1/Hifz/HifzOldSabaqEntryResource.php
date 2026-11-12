@@ -23,6 +23,7 @@ class HifzOldSabaqEntryResource extends JsonResource
                 'name' => $this->toSurah->name,
                 'arabic' => $this->toSurah->arabic,
             ],
+            'page' => $this->page ?? 0,
             'status' => $this->status,
             'strength' => $this->strength,
             'mistakes' => $this->mistakes,

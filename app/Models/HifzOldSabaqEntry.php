@@ -11,6 +11,7 @@ class HifzOldSabaqEntry extends Model
         'hifz_session_id',
         'from_surah_id',
         'to_surah_id',
+        'page',
         'status',
         'strength',
         'mistakes',

@@ -19,7 +19,13 @@ readonly class UpdateHifzSessionDTO
         return new self(
             session_date: $request->session_date,
             notes: $request->notes,
-            old_sabaq: $request->input('old_sabaq', []),
+            old_sabaq: array_map(
+                fn ($entry) => [
+                    ...$entry,
+                    'page' => $entry['page'] ?? 0,
+                ],
+                $request->input('old_sabaq', [])
+            ),
             manzil: $request->input('manzil', []),
             new_sabaq: $request->input('new_sabaq', []),
         );
