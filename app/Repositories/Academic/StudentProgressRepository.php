@@ -4,9 +4,11 @@ namespace App\Repositories\Academic;
 
 use App\Contracts\Academic\StudentProgressInterface;
 use App\DTOs\Academic\StoreStudentProgressDTO;
+use App\Enums\AttendanceStatus;
 use App\Enums\ProgressGrade;
 use App\Models\Student;
 use App\Models\StudentProgress;
+use App\Models\Surah;
 use App\Models\Teacher;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,7 +38,7 @@ class StudentProgressRepository implements StudentProgressInterface
         $search = trim($filters['search'] ?? '');
         $classId = $filters['academic_class_id'] ?? null;
 
-        return $this->visibleStudentsQuery($classIds)
+        return $this->withStats($this->visibleStudentsQuery($classIds))
             ->with(['user', 'academicClasses:id,name'])
             ->withCount('progressRecords')
             ->withMax('progressRecords', 'progress_date')
@@ -60,7 +62,7 @@ class StudentProgressRepository implements StudentProgressInterface
 
     public function findStudent(int $studentId, ?array $classIds): ?Student
     {
-        return $this->visibleStudentsQuery($classIds)
+        return $this->withStats($this->visibleStudentsQuery($classIds))
             ->with(['user', 'academicClasses.courses'])
             ->find($studentId);
     }
@@ -122,6 +124,33 @@ class StudentProgressRepository implements StudentProgressInterface
                     $query->whereIn('academic_classes.id', $classIds);
                 });
             });
+    }
+
+    /**
+     * Adds hifz and attendance counts used by the progress cards:
+     * memorised_surahs_count, total_surahs_count and
+     * attendance_{total,present,late,absent}_count.
+     */
+    private function withStats(Builder $query): Builder
+    {
+        return $query
+            ->select('students.*')
+            ->selectSub(Surah::query()->selectRaw('COUNT(*)'), 'total_surahs_count')
+            ->withCount([
+                'surahProgress as memorised_surahs_count' => function (Builder $query) {
+                    $query->where('status', 'memorised');
+                },
+                'attendances as attendance_total_count',
+                'attendances as attendance_present_count' => function (Builder $query) {
+                    $query->where('status', AttendanceStatus::PRESENT->value);
+                },
+                'attendances as attendance_late_count' => function (Builder $query) {
+                    $query->where('status', AttendanceStatus::LATE->value);
+                },
+                'attendances as attendance_absent_count' => function (Builder $query) {
+                    $query->where('status', AttendanceStatus::ABSENT->value);
+                },
+            ]);
     }
 
     private function perPage(array $filters): int
