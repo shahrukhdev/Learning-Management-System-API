@@ -30,11 +30,12 @@ class UserService
     public function createUser(array $data): User
     {
         $classId = $this->pullClassId($data);
+        $classIds = $this->pullClassIds($data);
 
-        return DB::transaction(function () use ($data, $classId) {
+        return DB::transaction(function () use ($data, $classId, $classIds) {
             $user = $this->repository->createUser($data);
 
-            $this->syncRoleProfile($user, $classId);
+            $this->syncRoleProfile($user, $classId, $classIds);
 
             return $this->loadRelations($user);
         });
@@ -48,11 +49,12 @@ class UserService
     public function updateUser(int $id, array $data): User
     {
         $classId = $this->pullClassId($data);
+        $classIds = $this->pullClassIds($data);
 
-        return DB::transaction(function () use ($id, $data, $classId) {
+        return DB::transaction(function () use ($id, $data, $classId, $classIds) {
             $user = $this->repository->updateUser($id, $data);
 
-            $this->syncRoleProfile($user, $classId);
+            $this->syncRoleProfile($user, $classId, $classIds);
 
             return $this->loadRelations($user);
         });
@@ -81,25 +83,32 @@ class UserService
         return $classId;
     }
 
+    private function pullClassIds(array &$data): array
+    {
+        $classIds = array_map('intval', $data['class_ids'] ?? []);
+
+        unset($data['class_ids']);
+
+        return $classIds;
+    }
+
     private function loadRelations(User $user): User
     {
         return $user->load(['roles', 'student.academicClasses']);
     }
 
-    private function syncRoleProfile(User $user, ?int $classId): void
+    private function syncRoleProfile(User $user, ?int $classId, array $classIds = []): void
     {
         $role = $user->roles->first()?->name;
 
         match ($role) {
-            'Teacher' => $this->teacherService->syncProfile($user->id),
+            'Teacher' => $this->syncTeacherProfile($user, $classIds),
 
             'Parent' => $this->parentService->syncProfile($user->id),
 
             default => $this->deleteRoleProfiles($user->id),
         };
 
-        // Student: keep the existing record (or create a new one) and sync its class.
-        // Any other role: soft-delete the student record if the user had one.
         if ($role === 'Student') {
             if ($classId === null) {
                 throw new ApiException(
@@ -132,5 +141,11 @@ class UserService
 
             default => null,
         };
+    }
+
+    private function syncTeacherProfile(User $user, array $classIds): void
+    {
+        $this->teacherService->syncProfile($user->id);
+        $this->teacherService->syncClasses($user->id, $classIds);
     }
 }

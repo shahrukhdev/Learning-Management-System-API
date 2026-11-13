@@ -5,6 +5,7 @@ namespace App\Services\Academic;
 use App\Contracts\TeacherInterface;
 use App\DTOs\Academic\CreateTeacherDTO;
 use App\DTOs\Academic\UpdateTeacherDTO;
+use App\Exceptions\ApiException;
 use App\Models\Teacher;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -57,5 +58,19 @@ class TeacherService
         if ($teacher) {
             $this->teacherRepository->delete($teacher);
         }
+    }
+
+    public function syncClasses(int $userId, array $classIds): void
+    {
+        $teacher = $this->teacherRepository->findByUserId($userId);
+
+        if (!$teacher) {
+            throw new ApiException(
+                message: 'Teacher profile not found.',
+                status: 404,
+            );
+        }
+
+        $teacher->academicClasses()->sync($classIds);
     }
 }

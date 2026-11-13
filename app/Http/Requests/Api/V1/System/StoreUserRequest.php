@@ -61,6 +61,17 @@ class StoreUserRequest extends FormRequest
                 'integer',
                 Rule::exists('academic_classes', 'id'),
             ],
+            'class_ids' => [
+                Rule::requiredIf(fn () => $this->hasTeacherRole()),
+                'nullable',
+                'array',
+                'min:1',
+            ],
+            'class_ids.*' => [
+                'integer',
+                'distinct',
+                Rule::exists('academic_classes', 'id'),
+            ],
         ];
     }
 
@@ -68,6 +79,8 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'class_id.required' => 'The class field is required for students.',
+            'class_ids.required' => 'At least one class is required for teachers.',
+            'class_ids.min' => 'At least one class is required for teachers.',
         ];
     }
 
@@ -78,6 +91,17 @@ class StoreUserRequest extends FormRequest
         return !empty($roleIds) && Role::query()
             ->whereIn('id', $roleIds)
             ->where('name', 'Student')
+            ->where('guard_name', 'web')
+            ->exists();
+    }
+    
+    private function hasTeacherRole(): bool
+    {
+        $roleIds = array_filter((array) $this->input('roles', []), 'is_numeric');
+
+        return !empty($roleIds) && Role::query()
+            ->whereIn('id', $roleIds)
+            ->where('name', 'Teacher')
             ->where('guard_name', 'web')
             ->exists();
     }
