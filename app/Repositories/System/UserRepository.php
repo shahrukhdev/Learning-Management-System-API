@@ -41,11 +41,8 @@ class UserRepository implements UserInterface
             });
         }
 
-        $sortDirection = ($filters['sort_direction'] ?? 'asc') === 'desc'
-            ? 'desc'
-            : 'asc';
-
-        $query->orderBy('name', $sortDirection);
+        // Latest first (id breaks ties between users created in the same second).
+        $query->latest()->orderByDesc('id');
 
         $perPage = min(max((int) ($filters['per_page'] ?? 10), 1), 100);
 
