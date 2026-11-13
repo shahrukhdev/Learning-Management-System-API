@@ -28,7 +28,8 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
             'hifz_overview' => $this->getHifzOverview(),
 
             'attendance_overview' => $this->getAttendanceOverview(
-                $dto->attendancePeriod
+                $dto->attendancePeriod,
+                $classIds
             ),
 
             'quran_progress_overview' => $this->getQuranProgressOverview(),
@@ -95,12 +96,14 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
 
         $currentWeekAttendance = $this->getAttendanceAggregates(
             $currentWeekStart,
-            now()->startOfDay()
+            now()->startOfDay(),
+            $classIds
         );
 
         $previousWeekAttendance = $this->getAttendanceAggregates(
             $previousWeekStart,
-            $previousWeekEnd
+            $previousWeekEnd,
+            $classIds
         );
 
         $currentAttendanceRate = $this->calculateAttendanceRate(
@@ -163,7 +166,7 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
             });
     }
 
-    private function getAttendanceOverview(string $period): array
+    private function getAttendanceOverview(string $period, ?array $classIds = null): array
     {
         $today = now()->startOfDay();
 
@@ -177,7 +180,8 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
 
         $records = $this->getAttendanceAggregates(
             $startDate,
-            $today
+            $today,
+            $classIds
         );
 
         $data = [];
@@ -289,9 +293,15 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
 
     private function getAttendanceAggregates(
         Carbon $startDate,
-        Carbon $endDate
+        Carbon $endDate,
+        ?array $classIds = null
     ): Collection {
         return Attendance::query()
+            ->when($classIds !== null, function ($query) use ($classIds) {
+                $query->whereHas('student.academicClasses', function ($q) use ($classIds) {
+                    $q->whereIn('academic_classes.id', $classIds);
+                });
+            })
             ->whereBetween('attendance_date', [
                 $startDate->toDateString(),
                 $endDate->toDateString(),
