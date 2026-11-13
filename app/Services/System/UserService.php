@@ -108,7 +108,7 @@ class UserService
 
     private function loadRelations(User $user): User
     {
-        return $user->load(['roles', 'student.academicClasses']);
+        return $user->load(['roles', 'student.academicClasses', 'teacher.academicClasses']);
     }
 
     private function syncRoleProfile(User $user, ?int $classId, array $classIds = [], ?int $year = null): void

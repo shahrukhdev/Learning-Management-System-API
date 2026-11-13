@@ -13,8 +13,14 @@ class UserRepository implements UserInterface
 {
     public function getAllUsers(array $filters = []): LengthAwarePaginator
     {
+        // Same relations as the single user, so every row has year / class (students)
+        // and class_ids (teachers).
         $query = User::query()
-            ->with('roles');
+            ->with([
+                'roles',
+                'student.academicClasses',
+                'teacher.academicClasses',
+            ]);
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];
