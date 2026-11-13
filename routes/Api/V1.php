@@ -110,6 +110,7 @@ Route::middleware('auth:sanctum')->prefix('attendances')->controller(AttendanceC
     Route::get('/', 'index')->name('index');
     Route::post('/', 'store')->name('store');
     Route::get('/overview', 'overview')->name('overview');
+    Route::get('/my-attendance', 'myAttendance')->name('my-attendance');
 });
 
 // Notice Routes

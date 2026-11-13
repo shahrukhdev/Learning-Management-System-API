@@ -7,9 +7,11 @@ use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Academic\GetAttendanceOverviewRequest;
 use App\Http\Requests\Api\V1\Academic\GetClassAttendanceRequest;
+use App\Http\Requests\Api\V1\Academic\GetMyAttendanceRequest;
 use App\Http\Requests\Api\V1\Academic\MarkAttendanceRequest;
 use App\Http\Resources\Api\V1\Academic\AttendanceOverviewResource;
 use App\Http\Resources\Api\V1\Academic\AttendanceResource;
+use App\Http\Resources\Api\V1\Academic\MyAttendanceRecordResource;
 use App\Services\Academic\AttendanceService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -91,6 +93,43 @@ class AttendanceController extends Controller
                 'success' => true,
                 'message' => 'Attendance overview retrieved successfully.',
                 'data' => AttendanceOverviewResource::collection($students),
+            ]);
+        } catch (ApiException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+                'errors' => $exception->getErrors(),
+            ], $exception->getStatus());
+        } catch (Exception $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong.',
+                'errors' => [],
+            ], 500);
+        }
+    }
+
+    /**
+     * The signed-in student's own attendance (Student role only).
+     */
+    public function myAttendance(GetMyAttendanceRequest $request): JsonResponse
+    {
+        try {
+            $attendance = $this->service->getMyAttendance(
+                $request->user(),
+                $request->period()
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Attendance retrieved successfully.',
+                'data' => [
+                    'period' => $attendance['period'],
+                    'start_date' => $attendance['start_date'],
+                    'end_date' => $attendance['end_date'],
+                    'summary' => $attendance['summary'],
+                    'records' => MyAttendanceRecordResource::collection($attendance['records'])->resolve($request),
+                ],
             ]);
         } catch (ApiException $exception) {
             return response()->json([

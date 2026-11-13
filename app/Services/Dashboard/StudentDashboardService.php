@@ -4,6 +4,7 @@ namespace App\Services\Dashboard;
 
 use App\Contracts\Dashboard\StudentDashboardInterface;
 use App\DTOs\Dashboard\DashboardSummaryDTO;
+use App\Enums\AttendancePeriod;
 use App\Enums\AttendanceStatus;
 use App\Exceptions\ApiException;
 use App\Models\Student;
@@ -149,12 +150,9 @@ class StudentDashboardService
     private function attendanceOverviewSection(?Student $student, string $period): array
     {
         $today = now()->startOfDay();
-
-        $startDate = match ($period) {
-            '30days' => $today->copy()->subDays(29),
-            '3months' => $today->copy()->startOfMonth()->subMonths(2),
-            default => $today->copy()->subDays(6),
-        };
+        $attendancePeriod = AttendancePeriod::fromValue($period);
+        $period = $attendancePeriod->value;
+        $startDate = $attendancePeriod->startDate($today);
 
         $statuses = $student
             ? $this->repository->getAttendanceStatusesByDate($student->id, $startDate, $today)

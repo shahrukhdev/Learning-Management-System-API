@@ -84,4 +84,25 @@ class AttendanceRepository implements AttendanceInterface
             ->orderBy('admission_number')
             ->get();
     }
+
+    public function getStudentAttendanceRecords(
+        int $studentId,
+        Carbon $startDate,
+        Carbon $endDate
+    ): Collection {
+        return Attendance::query()
+            ->with('academicClass:id,name')
+            ->where('student_id', $studentId)
+            ->whereBetween('attendance_date', [
+                $startDate->toDateString(),
+                $endDate->toDateString(),
+            ])
+            ->orderBy('updated_at')
+            ->orderBy('id')
+            ->get()
+            // Later (more recently marked) records overwrite earlier ones for the same day.
+            ->keyBy(fn (Attendance $attendance) => $attendance->attendance_date->toDateString())
+            ->sortKeysDesc()
+            ->values();
+    }
 }
