@@ -6,5 +6,5 @@ use App\DTOs\Dashboard\DashboardSummaryDTO;
 
 interface DashboardSummaryInterface
 {
-    public function getDashboardSummary(DashboardSummaryDTO $dto): array;
+    public function getDashboardSummary(DashboardSummaryDTO $dto, ?array $classIds = null): array;
 }

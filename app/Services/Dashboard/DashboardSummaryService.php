@@ -13,6 +13,18 @@ class DashboardSummaryService
 
     public function getDashboardSummary(DashboardSummaryDTO $dto): array
     {
-        return $this->repository->getDashboardSummary($dto);
+        $user = auth()->user();
+
+        $classIds = null;
+
+        if ($user->hasRole('Teacher')) {
+            $teacher = $user->teacher;
+
+            $classIds = $teacher
+                ? $teacher->academicClasses()->pluck('academic_classes.id')->all()
+                : [];
+        }
+
+        return $this->repository->getDashboardSummary($dto, $classIds);
     }
 }

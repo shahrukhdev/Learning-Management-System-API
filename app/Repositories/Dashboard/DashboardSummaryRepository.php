@@ -23,7 +23,7 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
     public function getDashboardSummary(DashboardSummaryDTO $dto): array
     {
         return [
-            'statistics' => $this->getStatistics(),
+            'statistics' => $this->getStatistics($classIds),
 
             'hifz_overview' => $this->getHifzOverview(),
 
@@ -37,15 +37,27 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
         ];
     }
 
-    private function getStatistics(): array
+    private function getStatistics(?array $classIds = null): array
     {
         $today = now()->startOfDay();
         $yesterday = $today->copy()->subDay();
 
-        $totalStudents = Student::count();
+        $totalStudents = Student::query()
+            ->when($classIds !== null, function ($query) use ($classIds) {
+                $query->whereHas('academicClasses', function ($q) use ($classIds) {
+                    $q->whereIn('academic_classes.id', $classIds);
+                });
+            })
+            ->count();
+
         $totalTeachers = Teacher::count();
 
         $studentsAddedThisMonth = Student::query()
+            ->when($classIds !== null, function ($query) use ($classIds) {
+                $query->whereHas('academicClasses', function ($q) use ($classIds) {
+                    $q->whereIn('academic_classes.id', $classIds);
+                });
+            })
             ->whereBetween('created_at', [
                 now()->startOfMonth(),
                 now()->endOfMonth(),
