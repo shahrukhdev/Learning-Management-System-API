@@ -20,6 +20,10 @@ class NoticeResource extends JsonResource
             'message' => $this->message,
             'is_active' => $this->is_active,
             'created_at' => $this->created_at?->format('d-m-Y'),
+            'posted_by' => $this->postedBy ? [
+                'id' => $this->postedBy->id,
+                'name' => $this->postedBy->name,
+            ] : null,
         ];
     }
 }

@@ -24,7 +24,7 @@ class NoticeController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $notices = $this->service->getAllNotices($request->query());
+            $notices = $this->service->getAllNotices($request->query(), $request->user());
 
             return response()->json([
                 'success' => true,
@@ -74,10 +74,10 @@ class NoticeController extends Controller
         }
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Request $request, int $id): JsonResponse
     {
         try {
-            $notice = $this->service->getNotice($id);
+            $notice = $this->service->getNotice($id, $request->user());
 
             return response()->json([
                 'success' => true,

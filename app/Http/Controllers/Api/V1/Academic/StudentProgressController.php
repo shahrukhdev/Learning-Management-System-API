@@ -194,6 +194,72 @@ class StudentProgressController extends Controller
         }
     }
 
+    /**
+     * The signed-in student's own profile, summary and subjects (Student role only).
+     */
+    public function myShow(Request $request): JsonResponse
+    {
+        try {
+            $user = $request->user();
+            $details = $this->service->getMyDetails($user);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress retrieved successfully.',
+                'data' => [
+                    'student' => $details['student']
+                        ? new ProgressStudentResource($details['student'])
+                        : [
+                            // No student record yet: profile from the user only.
+                            'id' => null,
+                            'user_id' => $user->id,
+                            'name' => $user->name ?? '',
+                            'initials' => $user->initials ?? '',
+                            'email' => $user->email ?? '',
+                            'image' => $user->image,
+                            'admission_number' => '',
+                            'class_id' => null,
+                            'class_name' => '',
+                        ],
+                    'summary' => $details['summary'],
+                    'courses' => $details['courses']->map(fn ($course) => [
+                        'id' => $course->id,
+                        'name' => $course->name,
+                        'code' => $course->code ?? '',
+                    ])->values(),
+                ],
+            ]);
+        } catch (ApiException $exception) {
+            return $this->errorResponse($exception);
+        } catch (Exception $exception) {
+            return $this->serverErrorResponse();
+        }
+    }
+
+    /**
+     * The signed-in student's own records (10 per page, newest first, optional course_id).
+     */
+    public function myRecords(GetStudentProgressRecordsRequest $request): JsonResponse
+    {
+        try {
+            $records = $this->service->getMyRecords(
+                $request->user(),
+                $request->validated()
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Progress records retrieved successfully.',
+                'data' => StudentProgressResource::collection($records)->collection,
+                'pagination' => (new PaginationResource($records))->resolve(),
+            ]);
+        } catch (ApiException $exception) {
+            return $this->errorResponse($exception);
+        } catch (Exception $exception) {
+            return $this->serverErrorResponse();
+        }
+    }
+
     private function errorResponse(ApiException $exception): JsonResponse
     {
         return response()->json([

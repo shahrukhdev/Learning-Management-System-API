@@ -10,6 +10,7 @@ readonly class StoreNoticeDTO
         public string $title,
         public string $message,
         public bool $isActive,
+        public ?int $createdBy = null,
     ) {}
 
     public static function fromRequest(StoreNoticeRequest $request): self
@@ -20,6 +21,7 @@ readonly class StoreNoticeDTO
             title: $validated['title'],
             message: $validated['message'],
             isActive: $validated['is_active'],
+            createdBy: $request->user()?->id,
         );
     }
 
@@ -29,6 +31,7 @@ readonly class StoreNoticeDTO
             'title' => $this->title,
             'message' => $this->message,
             'is_active' => $this->isActive,
+            'created_by' => $this->createdBy,
         ];
     }
 }

@@ -98,6 +98,10 @@ Route::middleware('auth:sanctum')->prefix('students')->controller(StudentControl
 // Student Progress Routes
 Route::middleware('auth:sanctum')->prefix('student-progress')->controller(StudentProgressController::class)->name('student-progress.')->group(function () {
     Route::get('/', 'index')->name('index');
+    // Signed-in student's own progress (Student role only)
+    Route::get('/my', 'myShow')->name('my');
+    Route::get('/my/records', 'myRecords')->name('my.records');
+
     Route::get('/{studentId}', 'show')->whereNumber('studentId')->name('show');
     Route::get('/{studentId}/records', 'records')->whereNumber('studentId')->name('records');
     Route::post('/{studentId}/records', 'store')->whereNumber('studentId')->name('store');
@@ -121,10 +125,14 @@ Route::middleware('auth:sanctum')->prefix('attendances')->controller(AttendanceC
 // Notice Routes
 Route::middleware('auth:sanctum')->prefix('notices')->controller(NoticeController::class)->name('notices.')->group(function () {
     Route::get('/', 'index')->name('index');
-    Route::post('/', 'store')->name('store');
     Route::get('/{id}', 'show')->name('show');
-    Route::put('/{id}', 'update')->name('update');
-    Route::delete('/{id}', 'destroy')->name('destroy');
+
+    // Students can only read notices.
+    Route::middleware('deny.role:Student')->group(function () {
+        Route::post('/', 'store')->name('store');
+        Route::put('/{id}', 'update')->name('update');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+    });
 });
 
 // Teacher Routes

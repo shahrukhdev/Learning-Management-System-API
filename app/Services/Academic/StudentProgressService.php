@@ -3,6 +3,7 @@
 namespace App\Services\Academic;
 
 use App\Contracts\Academic\StudentProgressInterface;
+use App\Contracts\StudentInterface;
 use App\DTOs\Academic\StoreStudentProgressDTO;
 use App\DTOs\Academic\UpdateStudentProgressDTO;
 use App\Exceptions\ApiException;
@@ -10,6 +11,7 @@ use App\Models\Student;
 use App\Models\StudentProgress;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
 use Illuminate\Support\Collection;
 
 class StudentProgressService
@@ -20,9 +22,72 @@ class StudentProgressService
     /** Role that can view and log progress only for students in their assigned classes. */
     private const TEACHER_ROLE = 'Teacher';
 
+    /** Role that can view only their own progress (the /my endpoints). */
+    private const STUDENT_ROLE = 'Student';
+
     public function __construct(
-        protected StudentProgressInterface $repository
+        protected StudentProgressInterface $repository,
+        protected StudentInterface $studentRepository,
     ) {}
+
+    /**
+     * The signed-in student's own profile, summary and subjects (Student role only).
+     * A student without a student record gets student = null, zero counts and no courses.
+     *
+     * @return array{student: ?Student, summary: array, courses: Collection}
+     */
+    public function getMyDetails(User $user): array
+    {
+        $student = $this->resolveMyStudent($user);
+
+        if (!$student) {
+            return [
+                'student' => null,
+                'summary' => ['total_records' => 0, 'strong_results' => 0, 'needs_attention' => 0],
+                'courses' => collect(),
+            ];
+        }
+
+        return [
+            'student' => $student,
+            'summary' => $this->repository->getStudentSummary($student->id),
+            'courses' => $this->studentCourses($student),
+        ];
+    }
+
+    /**
+     * The signed-in student's own records, newest first (Student role only).
+     */
+    public function getMyRecords(User $user, array $filters = []): LengthAwarePaginator
+    {
+        $student = $this->resolveMyStudent($user);
+
+        if (!$student) {
+            return new Paginator(
+                [],
+                0,
+                (int) ($filters['per_page'] ?? 10),
+                (int) ($filters['page'] ?? 1)
+            );
+        }
+
+        return $this->repository->getStudentRecords($student->id, $filters);
+    }
+
+    private function resolveMyStudent(User $user): ?Student
+    {
+        if (!$user->hasRole(self::STUDENT_ROLE)) {
+            throw new ApiException(
+                message: 'Only students can view their own progress.',
+                status: 403
+            );
+        }
+
+        $student = $this->studentRepository->findByUserId($user->id);
+
+        // Same query as the Admin details page (classes + courses + stats).
+        return $student ? $this->repository->findStudent($student->id, null) : null;
+    }
 
     public function getStudents(User $user, array $filters = []): LengthAwarePaginator
     {

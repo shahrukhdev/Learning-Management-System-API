@@ -17,6 +17,7 @@ class NoticeRepository implements NoticeInterface
         $search = trim($filters['search'] ?? '');
 
         return Notice::query()
+            ->with('postedBy:id,name')
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('title', 'like', "%{$search}%")
@@ -38,13 +39,13 @@ class NoticeRepository implements NoticeInterface
     public function createNotice(StoreNoticeDTO $dto): Notice
     {
         return DB::transaction(function () use ($dto) {
-            return Notice::create($dto->toArray());
+            return Notice::create($dto->toArray())->load('postedBy:id,name');
         });
     }
 
     public function getNotice(int $id): Notice
     {
-        $notice = Notice::query()->find($id);
+        $notice = Notice::query()->with('postedBy:id,name')->find($id);
 
         if (!$notice) {
             throw new ApiException(message: 'Notice not found.', status: 404);
@@ -64,7 +65,7 @@ class NoticeRepository implements NoticeInterface
 
             $notice->update($dto->toArray());
 
-            return $notice;
+            return $notice->load('postedBy:id,name');
         });
     }
 
