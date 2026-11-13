@@ -29,4 +29,13 @@ class QuranMapRepository implements QuranMapInterface
             ->orderBy('number')
             ->get();
     }
+
+    public function getEmptyQuranMap(): Collection
+    {
+        return Surah::query()
+            ->with('juzSurahRanges.juz')
+            ->orderBy('number')
+            ->get()
+            ->each(fn (Surah $surah) => $surah->setRelation('studentProgress', new Collection()));
+    }
 }

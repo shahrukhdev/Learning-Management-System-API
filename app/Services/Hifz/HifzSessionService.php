@@ -6,6 +6,7 @@ use App\Contracts\Hifz\HifzSessionInterface;
 use App\DTOs\Hifz\StoreHifzSessionDTO;
 use App\DTOs\Hifz\UpdateHifzSessionDTO;
 use App\Models\HifzSession;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class HifzSessionService
@@ -17,6 +18,11 @@ class HifzSessionService
     public function getStudentSessions(int $studentId, ?string $date): Collection
     {
         return $this->repository->getStudentSessions($studentId, $date);
+    }
+
+    public function paginateStudentSessions(int $studentId, ?string $date, int $perPage): LengthAwarePaginator
+    {
+        return $this->repository->paginateStudentSessions($studentId, $date, $perPage);
     }
 
     public function createSession(StoreHifzSessionDTO $dto): HifzSession

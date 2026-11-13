@@ -20,26 +20,11 @@ class QuranMapController extends Controller
         try {
             $surahs = $this->service->getStudentQuranMap($studentId);
 
-            $memorised = $surahs->filter(
-                fn ($surah) => $surah->studentProgress->first()?->status === 'memorised'
-            )->count();
-
-            $inProgress = $surahs->filter(
-                fn ($surah) => $surah->studentProgress->first()?->status === 'progress'
-            )->count();
-
-            $remaining = $surahs->count() - $memorised - $inProgress;
-
             return response()->json([
                 'success' => true,
                 'message' => 'Quran map retrieved successfully.',
                 'data' => [
-                    'statistics' => [
-                        'total_surahs' => $surahs->count(),
-                        'memorised' => $memorised,
-                        'in_progress' => $inProgress,
-                        'remaining' => $remaining,
-                    ],
+                    'statistics' => $this->service->summarise($surahs),
                     'surahs' => QuranMapSurahResource::collection($surahs),
                 ],
             ]);
@@ -47,7 +32,7 @@ class QuranMapController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
-            ], $exception->status);
+            ], $exception->getStatus());
         } catch (Exception $exception) {
             return response()->json([
                 'success' => false,

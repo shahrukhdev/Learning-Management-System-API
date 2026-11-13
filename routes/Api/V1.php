@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\Dashboard\DashboardController;
 use App\Http\Controllers\Api\V1\Hifz\HifzSessionController;
 use App\Http\Controllers\Api\V1\Hifz\HifzStatisticsController;
 use App\Http\Controllers\Api\V1\Hifz\JuzController;
+use App\Http\Controllers\Api\V1\Hifz\MyHifzController;
 use App\Http\Controllers\Api\V1\Hifz\QuranMapController;
 use App\Http\Controllers\Api\V1\Hifz\SurahController;
 use App\Http\Controllers\Api\V1\Hifz\StudentSurahProgressController;
@@ -107,9 +108,13 @@ Route::middleware('auth:sanctum')->prefix('student-progress')->controller(Studen
 
 // Attendance Routes
 Route::middleware('auth:sanctum')->prefix('attendances')->controller(AttendanceController::class)->name('attendances.')->group(function () {
-    Route::get('/', 'index')->name('index');
-    Route::post('/', 'store')->name('store');
-    Route::get('/overview', 'overview')->name('overview');
+    // Class-based (other students' data): not for students.
+    Route::middleware('deny.role:Student')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/overview', 'overview')->name('overview');
+    });
+
     Route::get('/my-attendance', 'myAttendance')->name('my-attendance');
 });
 
@@ -147,18 +152,18 @@ Route::middleware('auth:sanctum')->prefix('juz')->controller(JuzController::clas
 });
 
 // Student Surah Progress Routes
-Route::middleware('auth:sanctum')->prefix('students/{studentId}/surah-progress')->controller(StudentSurahProgressController::class)->name('students.surah-progress.')->group(function () {
+Route::middleware(['auth:sanctum', 'deny.role:Student'])->prefix('students/{studentId}/surah-progress')->controller(StudentSurahProgressController::class)->name('students.surah-progress.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::post('/', 'store')->name('store');
 });
 
-Route::middleware('auth:sanctum')->prefix('surah-progress')->controller(StudentSurahProgressController::class)->name('surah-progress.')->group(function () {
+Route::middleware(['auth:sanctum', 'deny.role:Student'])->prefix('surah-progress')->controller(StudentSurahProgressController::class)->name('surah-progress.')->group(function () {
     Route::put('/{id}', 'update')->name('update');
     Route::delete('/{id}', 'destroy')->name('destroy');
 });
 
 // Hifz Session Routes
-Route::middleware('auth:sanctum')->prefix('students/{studentId}/hifz-sessions')->controller(HifzSessionController::class)->name('students.hifz-sessions.')->group(function () {
+Route::middleware(['auth:sanctum', 'deny.role:Student'])->prefix('students/{studentId}/hifz-sessions')->controller(HifzSessionController::class)->name('students.hifz-sessions.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::post('/', 'store')->name('store');
     Route::get('/{id}', 'show')->name('show');
@@ -166,8 +171,14 @@ Route::middleware('auth:sanctum')->prefix('students/{studentId}/hifz-sessions')-
     Route::delete('/{id}', 'destroy')->name('destroy');
 });
 
+// My Hifz Routes (signed-in student, read only)
+Route::middleware('auth:sanctum')->prefix('my-hifz')->controller(MyHifzController::class)->name('my-hifz.')->group(function () {
+    Route::get('/', 'show')->name('show');
+    Route::get('/sessions', 'sessions')->name('sessions');
+});
+
 // Quran Map Routes
-Route::middleware('auth:sanctum')->prefix('students/{studentId}/quran-map')->controller(QuranMapController::class)->name('students.quran-map.')->group(function () {
+Route::middleware(['auth:sanctum', 'deny.role:Student'])->prefix('students/{studentId}/quran-map')->controller(QuranMapController::class)->name('students.quran-map.')->group(function () {
     Route::get('/', 'index')->name('index');
 });
 
@@ -178,7 +189,7 @@ Route::middleware('auth:sanctum')->prefix('dashboard')->controller(DashboardCont
 });
 
 // Hifz Statistics Routes
-Route::middleware('auth:sanctum')->prefix('students/{studentId}/hifz-statistics')->controller(HifzStatisticsController::class)->name('students.hifz-statistics.')->group(function () {
+Route::middleware(['auth:sanctum', 'deny.role:Student'])->prefix('students/{studentId}/hifz-statistics')->controller(HifzStatisticsController::class)->name('students.hifz-statistics.')->group(function () {
     Route::get('/', 'show')->name('show');
 });
 

@@ -7,6 +7,7 @@ use App\DTOs\Hifz\StoreHifzSessionDTO;
 use App\DTOs\Hifz\UpdateHifzSessionDTO;
 use App\Exceptions\ApiException;
 use App\Models\HifzSession;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -36,6 +37,19 @@ class HifzSessionRepository implements HifzSessionInterface
             ->orderByDesc('session_date')
             ->orderByDesc('created_at')
             ->get();
+    }
+
+    public function paginateStudentSessions(int $studentId, ?string $date, int $perPage): LengthAwarePaginator
+    {
+        return HifzSession::query()
+            ->with($this->sessionRelations())
+            ->where('student_id', $studentId)
+            ->when($date, function ($query) use ($date) {
+                $query->whereDate('session_date', $date);
+            })
+            ->orderByDesc('session_date')
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
     }
 
     public function createSession(StoreHifzSessionDTO $dto): HifzSession

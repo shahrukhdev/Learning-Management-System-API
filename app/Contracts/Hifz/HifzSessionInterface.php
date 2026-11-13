@@ -5,11 +5,14 @@ namespace App\Contracts\Hifz;
 use App\DTOs\Hifz\StoreHifzSessionDTO;
 use App\DTOs\Hifz\UpdateHifzSessionDTO;
 use App\Models\HifzSession;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 interface HifzSessionInterface
 {
     public function getStudentSessions(int $studentId, ?string $date): Collection;
+
+    public function paginateStudentSessions(int $studentId, ?string $date, int $perPage): LengthAwarePaginator;
 
     public function createSession(StoreHifzSessionDTO $dto): HifzSession;
 
