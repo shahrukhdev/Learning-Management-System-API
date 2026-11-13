@@ -28,7 +28,7 @@ class UpdateHifzSessionRequest extends FormRequest
             ],
 
             'old_sabaq' => [
-                'required',
+                'sometimes',
                 'array',
             ],
             'old_sabaq.*.from_surah_id' => [
@@ -61,7 +61,7 @@ class UpdateHifzSessionRequest extends FormRequest
             ],
 
             'manzil' => [
-                'required',
+                'sometimes',
                 'array',
             ],
             'manzil.*.from_surah_id' => [
@@ -89,7 +89,7 @@ class UpdateHifzSessionRequest extends FormRequest
             ],
 
             'new_sabaq' => [
-                'required',
+                'sometimes',
                 'array',
             ],
             'new_sabaq.*.from_surah_id' => [
