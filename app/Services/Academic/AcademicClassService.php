@@ -16,7 +16,19 @@ class AcademicClassService
 
     public function getAllAcademicClasses(array $filters = []): LengthAwarePaginator
     {
-        return $this->repository->getAllAcademicClasses($filters);
+        $user = auth()->user();
+
+        $teacherId = null;
+
+        if ($user->hasRole('Teacher')) {
+            $teacherId = $user->teacher?->id;
+
+            if ($teacherId === null) {
+                return $this->repository->getAllAcademicClasses($filters, -1);
+            }
+        }
+
+        return $this->repository->getAllAcademicClasses($filters, $teacherId);
     }
 
     public function createAcademicClass(StoreAcademicClassDTO $dto): AcademicClass

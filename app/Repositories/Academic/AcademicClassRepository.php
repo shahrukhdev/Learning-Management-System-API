@@ -12,9 +12,15 @@ use Illuminate\Support\Facades\DB;
 
 class AcademicClassRepository implements AcademicClassInterface
 {
-    public function getAllAcademicClasses(array $filters = []): LengthAwarePaginator
+    public function getAllAcademicClasses(array $filters = [], ?int $teacherId = null): LengthAwarePaginator
     {
         $query = AcademicClass::query()->with(['courses', 'teachers.user']);
+
+        if ($teacherId !== null) {
+            $query->whereHas('teachers', function ($q) use ($teacherId) {
+                $q->where('teachers.id', $teacherId);
+            });
+        }
 
         if (!empty($filters['search'])) {
             $search = $filters['search'];

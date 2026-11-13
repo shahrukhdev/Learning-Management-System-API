@@ -9,7 +9,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface AcademicClassInterface
 {
-    public function getAllAcademicClasses(array $filters = []): LengthAwarePaginator;
+    public function getAllAcademicClasses(array $filters = [], ?int $teacherId = null): LengthAwarePaginator;
 
     public function createAcademicClass(StoreAcademicClassDTO $dto): AcademicClass;
 
