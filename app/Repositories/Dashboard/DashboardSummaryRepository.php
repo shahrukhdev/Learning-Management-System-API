@@ -25,7 +25,7 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
         return [
             'statistics' => $this->getStatistics($classIds),
 
-            'hifz_overview' => $this->getHifzOverview(),
+            'hifz_overview' => $this->getHifzOverview($classIds),
 
             'attendance_overview' => $this->getAttendanceOverview(
                 $dto->attendancePeriod,
@@ -132,9 +132,14 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
         ];
     }
 
-    private function getHifzOverview(): Collection
+    private function getHifzOverview(?array $classIds = null): Collection
     {
         return Student::query()
+            ->when($classIds !== null, function ($query) use ($classIds) {
+                $query->whereHas('academicClasses', function ($q) use ($classIds) {
+                    $q->whereIn('academic_classes.id', $classIds);
+                });
+            })
             ->whereHas('hifzSessions')
             ->with('user:id,name')
             ->withCount([
@@ -148,7 +153,6 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
             ->get()
             ->map(function (Student $student) {
                 $name = $student->user?->name ?? "Student #{$student->id}";
-
                 $memorisedSurahs = $student->memorised_surahs_count;
 
                 return [
@@ -157,10 +161,7 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
                     'initials' => $this->getInitials($name),
                     'memorised_surahs' => $memorisedSurahs,
                     'total_surahs' => self::TOTAL_SURAHS,
-                    'progress' => round(
-                        ($memorisedSurahs / self::TOTAL_SURAHS) * 100,
-                        1
-                    ),
+                    'progress' => round(($memorisedSurahs / self::TOTAL_SURAHS) * 100, 1),
                     'last_session_date' => $student->hifz_sessions_max_session_date,
                 ];
             });
