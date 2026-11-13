@@ -48,10 +48,20 @@ class StoreHifzSessionRequest extends FormRequest
                 'integer',
                 'exists:surahs,id',
             ],
+            'old_sabaq.*.from_ayah' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
             'old_sabaq.*.to_surah_id' => [
                 'required',
                 'integer',
                 'exists:surahs,id',
+            ],
+            'old_sabaq.*.to_ayah' => [
+                'required',
+                'integer',
+                'min:1',
             ],
             'old_sabaq.*.page' => [
                 'nullable',
@@ -167,9 +177,9 @@ class StoreHifzSessionRequest extends FormRequest
                 ->get(['id', 'number', 'ayahs'])
                 ->keyBy('id');
 
-            $this->validateSurahRanges($validator, $surahs, 'old_sabaq');
+            $this->validateAyahRanges($validator, $surahs, 'old_sabaq');
             $this->validateSurahRanges($validator, $surahs, 'manzil');
-            $this->validateNewSabaqRanges($validator, $surahs);
+            $this->validateAyahRanges($validator, $surahs, 'new_sabaq');
         });
     }
 
@@ -188,9 +198,13 @@ class StoreHifzSessionRequest extends FormRequest
         }
     }
 
-    private function validateNewSabaqRanges($validator, $surahs): void
+    /**
+     * Ayah checks for sections with an ayah range (Old Sabaq and New Sabaq):
+     * ayahs within the surah's ayah count, and the end not before the start.
+     */
+    private function validateAyahRanges($validator, $surahs, string $section): void
     {
-        foreach ($this->input('new_sabaq', []) as $index => $entry) {
+        foreach ($this->input($section, []) as $index => $entry) {
             $fromSurah = $surahs->get($entry['from_surah_id']);
             $toSurah = $surahs->get($entry['to_surah_id']);
 
@@ -200,14 +214,14 @@ class StoreHifzSessionRequest extends FormRequest
 
             if ($entry['from_ayah'] > $fromSurah->ayahs) {
                 $validator->errors()->add(
-                    "new_sabaq.{$index}.from_ayah",
+                    "{$section}.{$index}.from_ayah",
                     "The starting Ayah cannot exceed {$fromSurah->ayahs}."
                 );
             }
 
             if ($entry['to_ayah'] > $toSurah->ayahs) {
                 $validator->errors()->add(
-                    "new_sabaq.{$index}.to_ayah",
+                    "{$section}.{$index}.to_ayah",
                     "The ending Ayah cannot exceed {$toSurah->ayahs}."
                 );
             }
@@ -220,7 +234,7 @@ class StoreHifzSessionRequest extends FormRequest
                 )
             ) {
                 $validator->errors()->add(
-                    "new_sabaq.{$index}.to_ayah",
+                    "{$section}.{$index}.to_ayah",
                     'The ending position cannot be before the starting position.'
                 );
             }

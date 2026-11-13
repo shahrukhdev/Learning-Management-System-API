@@ -10,7 +10,9 @@ class HifzOldSabaqEntry extends Model
     protected $fillable = [
         'hifz_session_id',
         'from_surah_id',
+        'from_ayah',
         'to_surah_id',
+        'to_ayah',
         'page',
         'status',
         'strength',
