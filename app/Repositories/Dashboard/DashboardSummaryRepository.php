@@ -72,10 +72,20 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
             ->count();
 
         $sessionsToday = HifzSession::query()
+            ->when($classIds !== null, function ($query) use ($classIds) {
+                $query->whereHas('student.academicClasses', function ($q) use ($classIds) {
+                    $q->whereIn('academic_classes.id', $classIds);
+                });
+            })
             ->whereDate('session_date', $today)
             ->count();
 
         $sessionsYesterday = HifzSession::query()
+            ->when($classIds !== null, function ($query) use ($classIds) {
+                $query->whereHas('student.academicClasses', function ($q) use ($classIds) {
+                    $q->whereIn('academic_classes.id', $classIds);
+                });
+            })
             ->whereDate('session_date', $yesterday)
             ->count();
 
