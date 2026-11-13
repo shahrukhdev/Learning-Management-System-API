@@ -173,6 +173,7 @@ Route::middleware('auth:sanctum')->prefix('students/{studentId}/quran-map')->con
 // Dashboard Routes
 Route::middleware('auth:sanctum')->prefix('dashboard')->controller(DashboardController::class)->name('dashboard.')->group(function () {
     Route::get('/summary', 'summary')->name('summary');
+    Route::get('/student-summary', 'studentSummary')->name('student-summary');
 });
 
 // Hifz Statistics Routes
