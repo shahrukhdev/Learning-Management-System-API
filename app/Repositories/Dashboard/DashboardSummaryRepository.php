@@ -20,7 +20,7 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
 
     private const ON_TRACK_THRESHOLD = 70;
 
-    public function getDashboardSummary(DashboardSummaryDTO $dto): array
+    public function getDashboardSummary(DashboardSummaryDTO $dto, ?array $classIds = null): array
     {
         return [
             'statistics' => $this->getStatistics($classIds),
