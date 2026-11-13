@@ -19,6 +19,7 @@ class StudentResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'admission_number' => $this->admission_number,
+            'year' => $this->year,
             'date_of_birth' => $this->date_of_birth?->format('d-m-Y'),
             'gender' => $this->gender,
             'phone' => $this->phone,

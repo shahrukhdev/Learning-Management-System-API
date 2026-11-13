@@ -42,15 +42,16 @@ class StudentService
 
     /**
      * Ensure the user has an active student record enrolled in the given class.
-     * An existing record is kept (its phone is synced from the user's phone_no
-     * and its class is synced); otherwise a new one is created from the user's data.
+     * An existing record is kept (its phone is synced from the user's phone_no,
+     * and its year and class are synced); otherwise a new one is created from
+     * the user's data with the given year.
      */
-    public function syncProfile(User $user, int $academicClassId): void
+    public function syncProfile(User $user, int $academicClassId, int $year): void
     {
         $student = $this->repository->findByUserId($user->id);
 
         if ($student) {
-            if ($student->phone !== $user->phone_no) {
+            if ($student->phone !== $user->phone_no || $student->year !== $year) {
                 $student = $this->repository->updateStudent(
                     $student->id,
                     new UpdateStudentDTO(
@@ -66,6 +67,8 @@ class StudentService
                         genderProvided: false,
                         phoneProvided: true,
                         addressProvided: false,
+                        year: $year,
+                        yearProvided: true,
                     )
                 );
             }
@@ -78,6 +81,7 @@ class StudentService
                     gender: null,
                     phone: $user->phone_no,
                     address: null,
+                    year: $year,
                 )
             );
         }

@@ -13,6 +13,7 @@ readonly class StoreStudentDTO
         public ?string $gender,
         public ?string $phone,
         public ?string $address,
+        public ?int $year = null,
     ) {}
 
     public static function fromRequest(StoreStudentRequest $request): self
@@ -38,6 +39,7 @@ readonly class StoreStudentDTO
             'gender' => $this->gender,
             'phone' => $this->phone,
             'address' => $this->address,
+            'year' => $this->year,
         ];
     }
 }

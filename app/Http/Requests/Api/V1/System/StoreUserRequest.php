@@ -61,6 +61,13 @@ class StoreUserRequest extends FormRequest
                 'integer',
                 Rule::exists('academic_classes', 'id'),
             ],
+            'year' => [
+                Rule::requiredIf(fn () => $this->hasStudentRole()),
+                'nullable',
+                'integer',
+                'min:2000',
+                'max:' . (now()->year + 1),
+            ],
             'class_ids' => [
                 Rule::requiredIf(fn () => $this->hasTeacherRole()),
                 'nullable',
@@ -79,6 +86,9 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'class_id.required' => 'The class field is required for students.',
+            'year.required' => 'The year field is required for students.',
+            'year.min' => 'The year must be 2000 or later.',
+            'year.max' => 'The year cannot be later than next year.',
             'class_ids.required' => 'At least one class is required for teachers.',
             'class_ids.min' => 'At least one class is required for teachers.',
         ];

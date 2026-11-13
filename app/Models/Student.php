@@ -16,6 +16,7 @@ class Student extends Model
     protected $fillable = [
         'user_id',
         'admission_number',
+        'year',
         'date_of_birth',
         'gender',
         'phone',
@@ -26,6 +27,7 @@ class Student extends Model
     {
         return [
             'date_of_birth' => 'date',
+            'year' => 'integer',
         ];
     }
 

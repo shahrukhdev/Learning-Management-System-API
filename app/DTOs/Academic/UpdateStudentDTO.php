@@ -19,6 +19,8 @@ readonly class UpdateStudentDTO
         public bool $genderProvided,
         public bool $phoneProvided,
         public bool $addressProvided,
+        public ?int $year = null,
+        public bool $yearProvided = false,
     ) {}
 
     public static function fromRequest(UpdateStudentRequest $request): self
@@ -67,6 +69,10 @@ readonly class UpdateStudentDTO
 
         if ($this->addressProvided) {
             $data['address'] = $this->address;
+        }
+
+        if ($this->yearProvided) {
+            $data['year'] = $this->year;
         }
 
         return $data;

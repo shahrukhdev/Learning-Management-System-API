@@ -31,11 +31,12 @@ class UserService
     {
         $classId = $this->pullClassId($data);
         $classIds = $this->pullClassIds($data);
+        $year = $this->pullYear($data);
 
-        return DB::transaction(function () use ($data, $classId, $classIds) {
+        return DB::transaction(function () use ($data, $classId, $classIds, $year) {
             $user = $this->repository->createUser($data);
 
-            $this->syncRoleProfile($user, $classId, $classIds);
+            $this->syncRoleProfile($user, $classId, $classIds, $year);
 
             return $this->loadRelations($user);
         });
@@ -50,11 +51,12 @@ class UserService
     {
         $classId = $this->pullClassId($data);
         $classIds = $this->pullClassIds($data);
+        $year = $this->pullYear($data);
 
-        return DB::transaction(function () use ($id, $data, $classId, $classIds) {
+        return DB::transaction(function () use ($id, $data, $classId, $classIds, $year) {
             $user = $this->repository->updateUser($id, $data);
 
-            $this->syncRoleProfile($user, $classId, $classIds);
+            $this->syncRoleProfile($user, $classId, $classIds, $year);
 
             return $this->loadRelations($user);
         });
@@ -83,6 +85,18 @@ class UserService
         return $classId;
     }
 
+    /**
+     * year is a students column, not a users column; take it out of the payload.
+     */
+    private function pullYear(array &$data): ?int
+    {
+        $year = isset($data['year']) ? (int) $data['year'] : null;
+
+        unset($data['year']);
+
+        return $year;
+    }
+
     private function pullClassIds(array &$data): array
     {
         $classIds = array_map('intval', $data['class_ids'] ?? []);
@@ -97,7 +111,7 @@ class UserService
         return $user->load(['roles', 'student.academicClasses']);
     }
 
-    private function syncRoleProfile(User $user, ?int $classId, array $classIds = []): void
+    private function syncRoleProfile(User $user, ?int $classId, array $classIds = [], ?int $year = null): void
     {
         $role = $user->roles->first()?->name;
 
@@ -118,7 +132,15 @@ class UserService
                 );
             }
 
-            $this->studentService->syncProfile($user, $classId);
+            if ($year === null) {
+                throw new ApiException(
+                    message: 'The year field is required for students.',
+                    status: 422,
+                    errors: ['year' => ['The year field is required for students.']],
+                );
+            }
+
+            $this->studentService->syncProfile($user, $classId, $year);
         } else {
             $this->studentService->deleteProfile($user->id);
         }

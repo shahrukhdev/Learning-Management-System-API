@@ -45,6 +45,7 @@ class UserResource extends JsonResource
         $class = $this->student?->academicClasses->first();
 
         return [
+            'year' => $this->student?->year,
             'class_id' => $class?->id,
             'class' => $class ? [
                 'id' => $class->id,
