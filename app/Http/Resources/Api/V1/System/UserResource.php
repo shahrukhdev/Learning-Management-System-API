@@ -18,16 +18,27 @@ class UserResource extends JsonResource
             'image' => $this->image,
             'is_active' => (bool) $this->is_active,
             'last_login' => formatLastLogin($this->last_login),
+
             'roles' => RoleResource::collection(
                 $this->whenLoaded('roles')
             ),
-            $this->mergeWhen($this->relationLoaded('student'), fn () => $this->studentClass()),
+
+            $this->mergeWhen(
+                $this->relationLoaded('student'),
+                fn () => $this->studentClass()
+            ),
+
+            $this->mergeWhen(
+                $this->relationLoaded('teacher'),
+                fn () => $this->teacherClasses()
+            ),
+
             'created_at' => $this->created_at?->format('d-m-Y'),
         ];
     }
 
     /**
-     * The class of the user's active student record (null when not a student).
+     * The class of the user's active student record.
      */
     private function studentClass(): array
     {
@@ -39,6 +50,18 @@ class UserResource extends JsonResource
                 'id' => $class->id,
                 'name' => $class->name,
             ] : null,
+        ];
+    }
+
+    /**
+     * Academic classes assigned to the user's active teacher record.
+     */
+    private function teacherClasses(): array
+    {
+        $classes = $this->teacher?->academicClasses ?? collect();
+
+        return [
+            'class_ids' => $classes->pluck('id')->values(),
         ];
     }
 }
