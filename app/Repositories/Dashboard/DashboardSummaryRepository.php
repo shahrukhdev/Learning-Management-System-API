@@ -32,7 +32,7 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
                 $classIds
             ),
 
-            'quran_progress_overview' => $this->getQuranProgressOverview(),
+            'quran_progress_overview' => $this->getQuranProgressOverview($classIds),
 
             'announcements' => $this->getAnnouncements(),
         ];
@@ -238,10 +238,13 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
         ];
     }
 
-    private function getQuranProgressOverview(): Collection
+    private function getQuranProgressOverview(?array $classIds = null): Collection
     {
         return AcademicClass::query()
             ->where('is_active', true)
+            ->when($classIds !== null, function ($query) use ($classIds) {
+                $query->whereIn('id', $classIds);
+            })
             ->with([
                 'students.surahProgress' => function ($query) {
                     $query->where('status', 'memorised');
@@ -251,7 +254,6 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
             ->get()
             ->map(function (AcademicClass $academicClass) {
                 $students = $academicClass->students;
-
                 $studentCount = $students->count();
 
                 $totalMemorisedSurahs = $students->sum(
