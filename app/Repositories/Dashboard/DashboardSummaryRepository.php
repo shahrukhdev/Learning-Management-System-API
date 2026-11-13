@@ -25,6 +25,8 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
         return [
             'statistics' => $this->getStatistics($classIds),
 
+            'assigned_classes' => $this->getAssignedClassesCount($classIds),
+
             'hifz_overview' => $this->getHifzOverview($classIds),
 
             'attendance_overview' => $this->getAttendanceOverview(
@@ -321,6 +323,11 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
                     $record->attendance_date
                 )->toDateString()
             );
+    }
+
+    private function getAssignedClassesCount(?array $classIds = null): int
+    {
+        return $classIds !== null ? count($classIds) : 0;
     }
 
     private function calculateAttendanceRate(Collection $records): float
