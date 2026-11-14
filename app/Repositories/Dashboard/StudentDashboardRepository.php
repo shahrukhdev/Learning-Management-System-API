@@ -51,7 +51,9 @@ class StudentDashboardRepository implements StudentDashboardInterface
             ->with([
                 'manzilEntries' => fn ($query) => $query->orderBy('id'),
                 'manzilEntries.fromSurah:id,name',
+                'manzilEntries.fromSurah.juzSurahRanges.juz:id,number',
                 'manzilEntries.toSurah:id,name',
+                'manzilEntries.toSurah.juzSurahRanges.juz:id,number',
             ])
             ->orderByDesc('session_date')
             ->orderByDesc('id')

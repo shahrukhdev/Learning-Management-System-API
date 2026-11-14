@@ -112,9 +112,30 @@ class StudentDashboardService
         $toSurah = $entries->last()->toSurah?->name ?? '';
 
         // "Surah Al-Baqarah" or "Al-Fatihah – Al-Baqarah"
-        $label = $fromSurah === $toSurah
+        $surahLabel = $fromSurah === $toSurah
             ? "Surah {$fromSurah}"
             : "{$fromSurah} – {$toSurah}";
+
+        // Juz covered: from the first Juz of the starting surah to the last Juz
+        // of the ending surah, across all manzil entries of the session.
+        $fromJuz = $entries
+            ->flatMap(fn ($entry) => $entry->fromSurah?->juzSurahRanges ?? [])
+            ->pluck('juz.number')
+            ->filter()
+            ->min();
+
+        $toJuz = $entries
+            ->flatMap(fn ($entry) => $entry->toSurah?->juzSurahRanges ?? [])
+            ->pluck('juz.number')
+            ->filter()
+            ->max();
+
+        // "Juz 1" or "Juz 1–3"; falls back to the surah range if Juz data is missing.
+        $label = match (true) {
+            $fromJuz === null || $toJuz === null => $surahLabel,
+            $fromJuz === $toJuz => "Juz {$fromJuz}",
+            default => "Juz {$fromJuz}–{$toJuz}",
+        };
 
         $needsRevision = $entries->contains(
             fn ($entry) => in_array($entry->status, self::NEEDS_REVISION_STATUSES, true)
@@ -123,6 +144,9 @@ class StudentDashboardService
 
         return [
             'label' => $label,
+            'surahs' => $surahLabel,
+            'from_juz' => $fromJuz,
+            'to_juz' => $toJuz,
             'status' => $needsRevision ? 'needs-revision' : 'on-track',
             'assigned_date' => $session->session_date?->format('Y-m-d'),
         ];
