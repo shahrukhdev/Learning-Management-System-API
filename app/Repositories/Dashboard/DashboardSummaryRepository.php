@@ -10,6 +10,8 @@ use App\Models\HifzSession;
 use App\Models\Notice;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
@@ -19,6 +21,9 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
     private const TOTAL_SURAHS = 114;
 
     private const ON_TRACK_THRESHOLD = 70;
+
+    /** Max teachers listed in the "Teachers Available" box. */
+    private const TEACHERS_AVAILABLE_LIMIT = 5;
 
     public function getDashboardSummary(DashboardSummaryDTO $dto, ?array $classIds = null): array
     {
@@ -37,7 +42,60 @@ class DashboardSummaryRepository implements DashboardSummaryInterface
             'quran_progress_overview' => $this->getQuranProgressOverview($classIds),
 
             'announcements' => $this->getAnnouncements(),
+
+            // "Teachers Available" box: Super Admin / Admin only (classIds === null).
+            // Teachers get 0 and an empty list.
+            'teachers_total' => $classIds === null ? $this->activeTeachersQuery()->count() : 0,
+
+            'teachers_available' => $classIds === null ? $this->getTeachersAvailable() : collect(),
         ];
+    }
+
+    /**
+     * Active teacher accounts: a non-deleted teacher record whose user is
+     * active and has the Teacher role.
+     */
+    private function activeTeachersQuery(): Builder
+    {
+        return Teacher::query()
+            ->whereHas('user', function ($query) {
+                $query->where('is_active', true)
+                    ->whereHas('roles', fn ($q) => $q->where('name', 'Teacher'));
+            });
+    }
+
+    /**
+     * Up to TEACHERS_AVAILABLE_LIMIT active teachers, by name (A–Z), with their classes.
+     */
+    private function getTeachersAvailable(): Collection
+    {
+        return $this->activeTeachersQuery()
+            ->with([
+                'user:id,name,initials,image',
+                'academicClasses:id,name',
+            ])
+            ->orderBy(
+                User::query()->select('name')->whereColumn('users.id', 'teachers.user_id')
+            )
+            ->limit(self::TEACHERS_AVAILABLE_LIMIT)
+            ->get()
+            ->map(function (Teacher $teacher) {
+                $name = $teacher->user?->name ?? '';
+
+                return [
+                    'id' => $teacher->id,
+                    'name' => $name,
+                    'initials' => $teacher->user?->initials ?: $this->getInitials($name),
+                    'image' => $teacher->user?->image,
+                    'classes' => $teacher->academicClasses
+                        ->sortBy('name')
+                        ->map(fn ($class) => ['id' => $class->id, 'name' => $class->name])
+                        ->values(),
+                    // Shifts are not stored; the frontend hides it when null.
+                    'shift' => null,
+                ];
+            })
+            ->values();
     }
 
     private function getStatistics(?array $classIds = null): array
