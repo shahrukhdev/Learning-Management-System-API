@@ -19,7 +19,10 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://learning-management-system-vid7.vercel.app'],
+    'allowed_origins' => [
+        'http://localhost:5173',
+        'https://learning-management-system-vid7.vercel.app',
+    ],
     // 'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
