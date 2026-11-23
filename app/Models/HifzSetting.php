@@ -10,6 +10,7 @@ class HifzSetting extends Model
     protected $fillable = [
         'course_id',
         'total_pages',
+        'total_ayats',
     ];
 
     public function course(): BelongsTo
